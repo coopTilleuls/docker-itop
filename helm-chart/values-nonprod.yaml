@@ -1,0 +1,28 @@
+image:
+  repository: thomassamson33/itop-apache
+  tag: latest
+environment:
+  db_host: 10.66.0.3
+  db_name: itop
+  db_pwd: "7^3+1xR(lKCv9:bu"
+  db_user: itop
+
+ingress:
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+  - host: itop.lt-mut-nonprod.les-tilleuls.solutions
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: 
+  - secretName: itop-cert
+    hosts:
+    - itop.lt-mut-nonprod.les-tilleuls.solutions
+
+pvc:
+  storageClassName: regionalpd-sc-euwest1
+
+service:
+ targetPort: 8080
