@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+chown www-data:www-data conf data env-production log
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- php "$@"
+fi
+
+# show iTop log messages in docker logs
+tail -F log/setup.log log/error.log log/deadlocks.log log/deprecated-calls.log log/tools.log > /dev/stderr &
+
+exec "$@"
