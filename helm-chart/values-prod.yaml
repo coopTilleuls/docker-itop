@@ -12,14 +12,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
   hosts:
-  - host: itop.lt-mut-prod.les-tilleuls.solutions
+  - host: support.les-tilleuls.coop
     paths:
     - path: /
       pathType: ImplementationSpecific
   tls: 
   - secretName: itop-cert
     hosts:
-    - itop.lt-mut-prod.les-tilleuls.solutions
+    - support.les-tilleuls.coop
 
 pvc:
   storageClassName: regionalpd-sc-euwest1
