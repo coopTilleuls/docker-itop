@@ -80,11 +80,11 @@ spec:
           livenessProbe:
             httpGet:
               path: /webservices/status.php
-              port: http
+              port: 8080
           readinessProbe:
             httpGet:
               path: /webservices/status.php
-              port: http
+              port: 8080
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       initContainers:
@@ -92,7 +92,7 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         volumeMounts:
         - mountPath: "/var/www/html/conf"
-          name: itop-conf-pvc
+          name: itop-conf-pv
         - mountPath: "/var/www/html/config_php"
           name: itop-conf-php
         command: ['sh','-c','if test -f /var/www/html/conf/production/config-itop.php; then exit 0; else mkdir conf/production && cp config_php/config-itop.php conf/production/ && chmod 660 conf/production/config-itop.php; fi' ]
