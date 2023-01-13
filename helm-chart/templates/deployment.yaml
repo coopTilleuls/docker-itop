@@ -77,6 +77,12 @@ spec:
             - name: http
               containerPort: {{ .Values.container.port }}
               protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /webservices/status.php
+              port: 8080
+            periodSeconds: 3
+            failureThreshold: 20
           livenessProbe:
             httpGet:
               path: /webservices/status.php
