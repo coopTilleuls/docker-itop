@@ -66,4 +66,16 @@ This is not recommended.
 
 A mysql chart link in order to also have a db deployed to go with the iTop instance.
 
+## Installation
 
+At first installation, you need to follow the setup wizard : `/setup/`
+
+During this wizard, the url used for probes will fail during a few seconds. You need to manually edit the deployment to set livenessProbe and readinessProbe to set failureThreshold to 30.
+
+After the setup wizard, remove failureThreshold in readiness and liveness probes,
+
+Then enter container and run:
+```
+chown www-data: conf/production/config-itop.php
+chmod 440 conf/production/config-itop.php
+```
