@@ -49,7 +49,7 @@ pvc:
   conf:
     size: 1Gi
   data:
-    size: 10Gi
+    size: 1Gi
   env:
     size: 1Gi
   log:
