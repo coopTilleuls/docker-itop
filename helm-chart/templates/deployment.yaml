@@ -82,7 +82,7 @@ spec:
               path: /webservices/status.php
               port: 8080
             periodSeconds: 3
-            failureThreshold: 20
+            failureThreshold: 25
           livenessProbe:
             httpGet:
               path: /webservices/status.php
