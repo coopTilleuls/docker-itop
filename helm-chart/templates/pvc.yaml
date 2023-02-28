@@ -45,3 +45,16 @@ spec:
   resources:
     requests:
       storage: {{ .Values.pvc.log.size }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: itop-ext-pvc
+spec:
+  accessModes:
+    - {{ .Values.pvc.accessMode }}
+  storageClassName: {{ .Values.pvc.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.pvc.ext.size }}
