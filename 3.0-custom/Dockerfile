@@ -13,6 +13,14 @@ RUN apt-get update \
 		graphviz \
 		mariadb-client \
 		unzip \
+		# Security patch
+		curl \
+		libapr1 \
+		libaprutil1 \
+		libgssapi-krb5-2 \
+		libk5crypto3 \ 
+		linux-libc-dev \
+		openssl \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		apcu \
@@ -22,7 +30,7 @@ RUN apt-get update \
 		mysqli \
 		soap \
 		zip 
-
+	
 # Load iTop files
 RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
 	&& unzip /tmp/iTop.zip -d /tmp/ web/* \

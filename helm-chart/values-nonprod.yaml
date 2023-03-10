@@ -1,6 +1,6 @@
 image:
   repository: thomassamson33/itop-apache
-  tag: latest
+  tag: test
 environment:
   db_host: 10.66.0.3
   db_name: itop
