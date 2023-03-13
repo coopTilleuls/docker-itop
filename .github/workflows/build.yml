@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - name: Build/Push
+      uses: coopTilleuls/action-docker-build-push@v3
+      with:
+        IMAGE_NAME: itop-apache
+        BUILD_CONTEXT: 3.0-custom
+        REGISTRY_JSON_KEY: ${{ secrets.GITHUB_TOKEN }}
+        IMAGE_REPOSITORY: ghcr.io/cooptilleuls
+         
