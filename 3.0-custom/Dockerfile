@@ -32,7 +32,8 @@ RUN apt-get update \
 		zip 
 	
 # Load iTop files
-RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
+#RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
+RUN curl -L -o /tmp/iTop.zip https://github.com/Combodo/iTop/archive/refs/tags/${release}.zip \
 	&& unzip /tmp/iTop.zip -d /tmp/ web/* \
 	&& mv -v /tmp/web/* /var/www/html/ \
 	&& mkdir /var/www/html/env-production \
