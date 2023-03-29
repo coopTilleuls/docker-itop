@@ -1,6 +1,6 @@
 # Edit this file to introduce tasks to be run by cron.
 #
-*/1 * * * * www-data /usr/local/bin/php /var/www/html/webservices/cron.php --param_file=/var/www/html/env-production/itop-cron.params >>/var/log/itop-cron.log 2>&1
+*/1 * * * * /usr/local/bin/php /var/www/html/webservices/cron.php --param_file=/var/www/html/env-production/itop-cron.params >>/var/log/itop-cron.log 2>&1
 # Each task to run has to be defined through a single line
 # indicating with different fields when the task will be run
 # and what command to run for the task

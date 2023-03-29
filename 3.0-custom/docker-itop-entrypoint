@@ -9,4 +9,5 @@ fi
 # show iTop log messages in docker logs
 tail -F log/setup.log log/error.log log/deadlocks.log log/deprecated-calls.log log/tools.log > /dev/stderr &
 
+cron
 exec "$@"
