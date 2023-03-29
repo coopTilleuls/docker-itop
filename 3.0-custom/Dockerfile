@@ -55,7 +55,7 @@ ADD ./ports.conf /etc/apache2/ports.conf
 # Add crontab config
 ADD ./itop-background-task.cron /var/www/html/
 #Configure the crontab
-RUN crontab /var/www/html/itop-background-task.cron
+RUN crontab -u www-data /var/www/html/itop-background-task.cron
 # Add custom entrypoint
 COPY docker-itop-entrypoint /usr/local/bin/
 ENTRYPOINT ["docker-itop-entrypoint"]
