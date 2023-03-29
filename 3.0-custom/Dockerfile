@@ -13,6 +13,7 @@ RUN apt-get update \
 		graphviz \
 		mariadb-client \
 		unzip \
+		cron \ 
 		# Security patch
 		curl \
 		libapr1 \
@@ -21,8 +22,7 @@ RUN apt-get update \
 		libk5crypto3 \ 
 		linux-libc-dev \
 		openssl \
-		cron \ 
-		vim \
+		apache2 \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		apcu \
