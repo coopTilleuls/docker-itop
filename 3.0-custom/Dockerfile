@@ -13,6 +13,7 @@ RUN apt-get update \
 		graphviz \
 		mariadb-client \
 		unzip \
+		cron \ 
 		# Security patch
 		curl \
 		libapr1 \
@@ -21,6 +22,7 @@ RUN apt-get update \
 		libk5crypto3 \ 
 		linux-libc-dev \
 		openssl \
+		apache2 \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		apcu \
@@ -48,6 +50,10 @@ RUN chown -R www-data: /var/www/html/conf
 ADD ./apache2.conf /etc/apache2/sites-available/000-default.conf
 ADD ./ports.conf /etc/apache2/ports.conf
 
+# Add crontab config
+ADD ./itop-background-task.cron /var/www/html/
+#Configure the crontab
+RUN crontab -u www-data /var/www/html/itop-background-task.cron
 # Add custom entrypoint
 COPY docker-itop-entrypoint /usr/local/bin/
 ENTRYPOINT ["docker-itop-entrypoint"]

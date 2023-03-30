@@ -1,2 +1,10 @@
-#Faille composer dont l'image n'est toujours pas à jour
+#3.0.3 failles
+#CVE-2022-24894
+#CVE-2022-39261
+
+#3.0.2-1
+
+CVE-2021-46743
 CVE-2022-39369
+CVE-2022-24894
+CVE-2022-39261
