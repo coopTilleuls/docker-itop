@@ -23,6 +23,15 @@ RUN apt-get update \
 		linux-libc-dev \
 		openssl \
 		apache2 \
+		libc-bin \
+		liblua5.3-0 \
+		libncurses6 \
+		libncursesw6 \
+		libnghttp2-14 \
+		libtinfo6 \
+		ncurses-base \
+		ncurses-bin \
+		libc-dev-bin \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		apcu \
