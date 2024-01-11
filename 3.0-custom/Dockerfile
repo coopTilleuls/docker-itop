@@ -9,7 +9,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 
 # install extra packages
 RUN apt-get update \
-	&& apt-get install -y \
+	&& apt-get install -y --no-install-recommends \
 		graphviz \
 		mariadb-client \
 		unzip \
