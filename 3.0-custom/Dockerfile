@@ -49,7 +49,7 @@ RUN chown -R www-data: /var/www/html/conf
 # Add Apache conf
 ADD ./apache2.conf /etc/apache2/sites-available/000-default.conf
 ADD ./ports.conf /etc/apache2/ports.conf
-
+ADD ./robots.txt /var/www/html/robots.txt
 # Add crontab config
 ADD ./itop-background-task.cron /var/www/html/
 #Configure the crontab
