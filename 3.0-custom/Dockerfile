@@ -9,7 +9,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 
 # install extra packages
 RUN apt-get update \
-	&& apt-get install -y \
+	&& apt-get install -y --no-install-recommends \
 		graphviz \
 		mariadb-client \
 		unzip \
@@ -23,6 +23,15 @@ RUN apt-get update \
 		linux-libc-dev \
 		openssl \
 		apache2 \
+		libc-bin \
+		liblua5.3-0 \
+		libncurses6 \
+		libncursesw6 \
+		libnghttp2-14 \
+		libtinfo6 \
+		ncurses-base \
+		ncurses-bin \
+		libc-dev-bin \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		apcu \
@@ -49,7 +58,7 @@ RUN chown -R www-data: /var/www/html/conf
 # Add Apache conf
 ADD ./apache2.conf /etc/apache2/sites-available/000-default.conf
 ADD ./ports.conf /etc/apache2/ports.conf
-
+ADD ./robots.txt /var/www/html/robots.txt
 # Add crontab config
 ADD ./itop-background-task.cron /var/www/html/
 #Configure the crontab
