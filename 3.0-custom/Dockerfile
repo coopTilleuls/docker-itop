@@ -50,6 +50,9 @@ RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${
 	&& chown -R www-data: /var/www/html/ \
 	&& rm -rf /tmp/iTop.zip /tmp/web
 
+# Add custom logo
+COPY images/* /var/www/html/images/
+
 # Add default configuration
 COPY php.ini /usr/local/etc/php/php.ini
 COPY config-itop.php /var/www/html/conf/production/config-itop.php
