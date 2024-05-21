@@ -32,6 +32,18 @@ RUN apt-get update \
 		ncurses-base \
 		ncurses-bin \
 		libc-dev-bin \
+		bsdutils \ 
+		libblkid1 \ 
+		libmount1 \ 
+		libperl5.32 \
+		libsmartcols1 \ 
+		libuuid1 \
+		libglib2.0-0 \
+		mount \
+		perl \
+		perl-base \
+		perl-modules-5.32 \
+		util-linux \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		apcu \
