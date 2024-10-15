@@ -32,11 +32,12 @@ RUN apt-get update \
 		ncurses-base \
 		ncurses-bin \
 		libc-dev-bin \
-		bsdutils \ 
-		libblkid1 \ 
-		libmount1 \ 
+		bsdutils \
+		libblkid1 \
+        libexpat1 \
+		libmount1 \
 		libperl5.32 \
-		libsmartcols1 \ 
+		libsmartcols1 \
 		libuuid1 \
 		libglib2.0-0 \
 		mount \
@@ -52,8 +53,8 @@ RUN apt-get update \
 		mcrypt \
 		mysqli \
 		soap \
-		zip 
-	
+		zip
+
 # Load iTop files
 RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
 	&& unzip /tmp/iTop.zip -d /tmp/ web/* \
