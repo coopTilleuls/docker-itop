@@ -12,10 +12,11 @@ jobs:
     timeout-minutes: 15
     steps:
     - name: Build/Push
-      uses: coopTilleuls/action-docker-build-push@v4
+      uses: coopTilleuls/action-docker-build-push@v10
       with:
         IMAGE_NAME: itop-apache
         BUILD_CONTEXT: 3.0-custom
         REGISTRY_JSON_KEY: ${{ secrets.GITHUB_TOKEN }}
         IMAGE_REPOSITORY: ghcr.io/cooptilleuls
-         
+        SECURITY_SCAN: false
+
