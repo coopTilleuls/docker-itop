@@ -13,13 +13,13 @@ RUN apt-get update \
 		graphviz \
 		mariadb-client \
 		unzip \
-		cron \ 
+		cron \
 		# Security patch
 		curl \
 		libapr1 \
 		libaprutil1 \
 		libgssapi-krb5-2 \
-		libk5crypto3 \ 
+		libk5crypto3 \
 		linux-libc-dev \
 		openssl \
 		apache2 \
