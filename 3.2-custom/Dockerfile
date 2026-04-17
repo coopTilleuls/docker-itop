@@ -1,8 +1,8 @@
 FROM php:8.3-apache
 
 # Load version info from arguments
-ARG release
-ARG patch
+ARG release=3.2.2-1
+ARG patch=17851
 
 # Add helper script
 COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
