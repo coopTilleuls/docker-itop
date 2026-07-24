@@ -50,6 +50,8 @@ docker exec my-itop php webservices/cron.php --param_file=/etc/itop/cron.params
 
 ## Tags
 
+* `3.3.0`, `3.3`
+[(changelog)](https://www.itophub.io/wiki/page?id=3_3_0:release:change_log#section330)
 * `3.2.3`, `3.2`, `latest`
 [(Changelog)](https://www.itophub.io/wiki/page?id=3_2_0:release:change_log#section3231)
 * `2.7.13`, `2.7`
