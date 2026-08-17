@@ -1,2 +1,6 @@
 route:
   host: itop.lt-mut-nonprod-scw.les-tilleuls.solutions
+
+mariadb:
+  auth:
+    existingSecret: itop-mariadb-auth
