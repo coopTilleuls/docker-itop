@@ -99,18 +99,18 @@ spec:
           startupProbe:
             httpGet:
               path: /webservices/status.php
-              port: 8080
+              port: {{ .Values.container.port }}
             periodSeconds: 3
             failureThreshold: 25
           livenessProbe:
             httpGet:
               path: /webservices/status.php
-              port: 8080
+              port: {{ .Values.container.port }}
             failureThreshold: 10
           readinessProbe:
             httpGet:
               path: /webservices/status.php
-              port: 8080
+              port: {{ .Values.container.port }}
             failureThreshold: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
