@@ -1,0 +1,17 @@
+{{- if .Values.mariadb.enabled }}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  name: {{ include "itop-chart.mariadb.fullname" . }}-{{ .Values.mariadb.auth.username }}
+  labels:
+    {{- include "itop-chart.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ include "itop-chart.mariadb.fullname" . }}
+  privileges:
+    - "ALL PRIVILEGES"
+  database: {{ .Values.mariadb.database.name }}
+  table: "*"
+  username: {{ .Values.mariadb.auth.username }}
+  host: "%"
+{{- end }}

@@ -1,0 +1,20 @@
+{{- if .Values.mariadb.enabled }}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: {{ include "itop-chart.mariadb.fullname" . }}
+  labels:
+    {{- include "itop-chart.labels" . | nindent 4 }}
+spec:
+  image: {{ .Values.mariadb.instance.image }}
+  port: {{ .Values.mariadb.instance.port }}
+  replicas: {{ .Values.mariadb.instance.replicas }}
+  rootPasswordSecretKeyRef:
+    name: {{ include "itop-chart.mariadb.secretName" . }}
+    key: root-password
+  storage:
+    size: {{ .Values.mariadb.instance.storage.size }}
+    storageClassName: {{ .Values.mariadb.instance.storage.storageClassName }}
+  resources:
+    {{- toYaml .Values.mariadb.instance.resources | nindent 4 }}
+{{- end }}

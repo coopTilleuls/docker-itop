@@ -42,6 +42,38 @@ environment:
   db_user: <mysql-db-user>
 ```
 
+These `environment.db_*` values are only used when `mariadb.enabled` is `false` (external database). See the MariaDB section below for the default setup.
+
+### MariaDB (mariadb-operator)
+
+By default (`mariadb.enabled: true`), the chart provisions a dedicated database for this iTop instance using the [mariadb-operator](https://github.com/mariadb-operator/mariadb-operator). This requires the operator to already be installed on the target cluster — it is deployed cluster-wide via FluxCD on `lt-mut-nonprod-scw` and `lt-mut-prod-scw`.
+
+The chart creates, in the release namespace:
+- a `MariaDB` resource: the database instance itself (`templates/mariadb/mariadb.yaml`)
+- a `Database` resource for the iTop schema
+- a `User` and a `Grant` giving that user full rights on the database
+- a `Secret` holding the generated root and iTop user passwords (unless `mariadb.auth.existingSecret` is set)
+
+The iTop `Deployment` is wired to this instance automatically: `DB_HOSTNAME` points at the `MariaDB` resource's Service, and `DB_ENV_MYSQL_PASSWORD` is read from the managed secret.
+
+```yaml
+mariadb:
+  enabled: true
+  instance:
+    image: mariadb:11.4.3
+    replicas: 1
+    storage:
+      size: 10Gi
+      storageClassName: standard
+  database:
+    name: itop
+  auth:
+    username: itop
+    existingSecret: "" # provide your own secret (keys: root-password, password) instead of letting the chart generate one
+```
+
+To use an externally managed database instead, set `mariadb.enabled: false` and fill in `environment.db_*`.
+
 ### Pod security
 
 In order to allow the iTop service to access the files on the system, adding specific security context for the pod was needed, those can be found in the deployment.yaml file

@@ -1,0 +1,87 @@
+name: Deploy
+
+on:
+  workflow_call:
+    secrets:
+      workload-identity-provider:
+        description: GCP workload identity provider
+        required: true
+      project-id:
+        description: GCP project ID
+        required: true
+      google_client_id:
+        description: client id for oidc
+        required: true
+      google_client_secret:
+        description: GCP Client secret for OIDC
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      pull-requests: 'write'
+    environment:
+      name: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: GKE Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: '${{ secrets.project-id }}'
+          workload_identity_provider: '${{ secrets.workload-identity-provider }}'
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.project-id }}
+
+      - name: Connect cluster
+        run: |
+          gcloud components install gke-gcloud-auth-plugin
+          gcloud auth login --cred-file=$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE
+          gcloud container clusters get-credentials lt-mut-prod --region europe-west1 --project ${{ secrets.project-id }}
+          kubectl config view
+
+      - name: Deploy on namespace
+        id: deploy
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! helm upgrade --install otter-wiki ./helm \
+            --atomic \
+            --debug \
+            --timeout 600s \
+            --namespace tools-wiki \
+            --set=image.tag=${{ github.ref_name }} \
+            --set=oidc.google_client_secret=${{ secrets.google_client_secret }} \
+            --set=oidc.google_client_id=${{ secrets.google_client_id }}  \
+            --values ./helm/values.yaml \
+            --values ./helm/values-prod.yaml \
+            | sed --unbuffered '/USER-SUPPLIED VALUES/,$d' ; then
+                echo "Deployment has failed!"
+                echo "Here are the last events to help diagnose the problem:"
+                kubectl get events --sort-by  --namespace ${{ needs.meta.outputs.namespace }} .metadata.creationTimestamp
+                exit 1
+          fi
+
+      - name: Output deployment URL
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          URL: ${{ needs.meta.outputs.url }}
+        with:
+          script: |
+            const { URL } = process.env
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Chart has been deployed with this url:\n\`\`\`\n${URL}\n\`\`\``
+            })

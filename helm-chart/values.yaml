@@ -9,11 +9,39 @@ image:
   pullPolicy: Always
   tag: "3.0"
 
+# Only used when mariadb.enabled is false, to point iTop at an externally managed database.
 environment:
   db_host: <mysql-server-url> "mysql-chart.database.svc.cluster.local"
   db_name: <mysql-db-name>
   db_pwd: <mysql-db-pwd>
   db_user: <mysql-db-user>
+
+# Dedicated MariaDB instance provisioned via the mariadb-operator
+# (https://github.com/mariadb-operator/mariadb-operator), already installed on the
+# lt-mut-nonprod-scw and lt-mut-prod-scw clusters. When enabled, this takes precedence
+# over the `environment.db_*` values above.
+mariadb:
+  enabled: true
+  instance:
+    image: mariadb:11.4.3
+    replicas: 1
+    port: 3306
+    storage:
+      size: 10Gi
+      storageClassName: standard
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+  database:
+    name: itop
+    characterSet: utf8mb4
+    collate: utf8mb4_unicode_ci
+  auth:
+    username: itop
+    # Name of an existing secret with "root-password" and "password" keys.
+    # Leave empty to let the chart generate and manage one automatically.
+    existingSecret: ""
 
 imagePullSecrets: []
 nameOverride: ""

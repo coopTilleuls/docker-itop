@@ -70,14 +70,28 @@ spec:
             - mountPath: "/var/www/html/extensions"
               name: itop-ext-pv
           env:
+          {{- if .Values.mariadb.enabled }}
             - name: "DB_ENV_MYSQL_DATABASE"
-              value: {{ .Values.environment.db_name}}
+              value: {{ .Values.mariadb.database.name | quote }}
             - name: "DB_HOSTNAME"
-              value: {{ .Values.environment.db_host}}
+              value: {{ include "itop-chart.mariadb.fullname" . | quote }}
             - name: "DB_ENV_MYSQL_USER"
-              value: {{ .Values.environment.db_user}}
+              value: {{ .Values.mariadb.auth.username | quote }}
             - name: "DB_ENV_MYSQL_PASSWORD"
-              value: {{ .Values.environment.db_pwd}}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "itop-chart.mariadb.secretName" . }}
+                  key: password
+          {{- else }}
+            - name: "DB_ENV_MYSQL_DATABASE"
+              value: {{ .Values.environment.db_name | quote }}
+            - name: "DB_HOSTNAME"
+              value: {{ .Values.environment.db_host | quote }}
+            - name: "DB_ENV_MYSQL_USER"
+              value: {{ .Values.environment.db_user | quote }}
+            - name: "DB_ENV_MYSQL_PASSWORD"
+              value: {{ .Values.environment.db_pwd | quote }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.container.port }}

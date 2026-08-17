@@ -1,0 +1,13 @@
+{{- if .Values.mariadb.enabled }}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  name: {{ include "itop-chart.mariadb.fullname" . }}-{{ .Values.mariadb.database.name }}
+  labels:
+    {{- include "itop-chart.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ include "itop-chart.mariadb.fullname" . }}
+  characterSet: {{ .Values.mariadb.database.characterSet }}
+  collate: {{ .Values.mariadb.database.collate }}
+{{- end }}

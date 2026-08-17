@@ -1,0 +1,15 @@
+{{- if .Values.mariadb.enabled }}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: {{ include "itop-chart.mariadb.fullname" . }}-{{ .Values.mariadb.auth.username }}
+  labels:
+    {{- include "itop-chart.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ include "itop-chart.mariadb.fullname" . }}
+  passwordSecretKeyRef:
+    name: {{ include "itop-chart.mariadb.secretName" . }}
+    key: password
+  host: "%"
+{{- end }}

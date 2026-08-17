@@ -60,3 +60,19 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Name of the MariaDB instance (mariadb-operator MariaDB resource) backing this release.
+This also becomes the DNS name of the Service the operator creates for it.
+*/}}
+{{- define "itop-chart.mariadb.fullname" -}}
+{{- printf "%s-mariadb" (include "itop-chart.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Name of the secret holding the MariaDB root and iTop user passwords.
+Uses .Values.mariadb.auth.existingSecret when set, otherwise a chart-managed secret.
+*/}}
+{{- define "itop-chart.mariadb.secretName" -}}
+{{- default (printf "%s-auth" (include "itop-chart.mariadb.fullname" .)) .Values.mariadb.auth.existingSecret }}
+{{- end }}
