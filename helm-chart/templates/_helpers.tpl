@@ -62,6 +62,13 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Name of the itop web app Deployment.
+*/}}
+{{- define "itop-chart.app.fullname" -}}
+{{- printf "%s-app" (include "itop-chart.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
 Name of the MariaDB instance (mariadb-operator MariaDB resource) backing this release.
 This also becomes the DNS name of the Service the operator creates for it.
 */}}

@@ -44,7 +44,7 @@ mariadb:
     existingSecret: ""
 
 imagePullSecrets: []
-nameOverride: ""
+nameOverride: "itop"
 fullnameOverride: ""
 
 serviceAccount:
