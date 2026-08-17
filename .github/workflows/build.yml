@@ -35,7 +35,7 @@ jobs:
     - name: Build/Push
       uses: docker/build-push-action@v6
       with:
-        context: .
+        context: 3.2-custum
         tags: ${{ steps.meta.outputs.tags }}
         push: true
         cache-from: |
