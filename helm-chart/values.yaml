@@ -90,26 +90,23 @@ service:
   port: 80
   targetPort: 80
 
-ingress:
+route:
   enabled: true
-  className: ""
-  annotations: 
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: itop.<your-host>
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  # uncomment tls and add your secret name if you want to add https to your itop installation
-  # tls: 
-  # - secretName: itop-cert
-  #   hosts:
-  #     -  itop.<your-host>
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  gateway:
+    # -- Name of the (pre-existing) Gateway this HTTPRoute attaches to.
+    name: traefik
+    # -- Set when the Gateway lives in a different namespace than this release. Requires a ReferenceGrant in
+    # that namespace allowing HTTPRoutes from this release's namespace to attach (created alongside the Gateway,
+    # not by this chart).
+    namespace: infra-traefik
+    # -- Restrict attachment to one specific listener on the Gateway (e.g. a dedicated HTTPS listener), leave
+    # empty to attach to every listener that allows it.
+    sectionName: https
+  # -- Free-form, in case the HTTPRoute itself ever needs annotations (rare with Gateway API)
+  annotations: {}
+  host: itop.<your-host>
+  # -- Additional hostnames routed to the same backend (e.g. a bare/www alias)
+  extraHosts: []
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
