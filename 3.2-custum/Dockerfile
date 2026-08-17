@@ -2,7 +2,7 @@ FROM php:7.4-apache
 
 # load version info from arguments
 ARG release=3.2.3-2
-ARG patch=29678
+ARG patch=20678
 
 # add helper script
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
@@ -58,8 +58,8 @@ RUN apt-get update \
 	&& rm -rf /var/cache/apt
 
 # Load iTop files
-RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
-	&& unzip /tmp/iTop.zip -d /tmp/ web/* \
+RUN mkdir -p /tmp/web && curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
+	&& unzip /tmp/iTop.zip -d /tmp/web/*  \
 	&& mv -v /tmp/web/* /var/www/html/ \
 	&& mkdir /var/www/html/env-production \
 	&& chown -R www-data: /var/www/html/ \
