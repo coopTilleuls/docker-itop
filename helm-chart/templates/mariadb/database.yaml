@@ -8,6 +8,7 @@ metadata:
 spec:
   mariaDbRef:
     name: {{ include "itop-chart.mariadb.fullname" . }}
+  name: {{ .Values.mariadb.database.name }}
   characterSet: {{ .Values.mariadb.database.characterSet }}
   collate: {{ .Values.mariadb.database.collate }}
 {{- end }}

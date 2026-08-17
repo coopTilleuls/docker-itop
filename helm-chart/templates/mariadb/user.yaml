@@ -8,6 +8,7 @@ metadata:
 spec:
   mariaDbRef:
     name: {{ include "itop-chart.mariadb.fullname" . }}
+  name: {{ .Values.mariadb.auth.username }}
   passwordSecretKeyRef:
     name: {{ include "itop-chart.mariadb.secretName" . }}
     key: password
