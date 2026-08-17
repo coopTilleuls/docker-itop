@@ -64,7 +64,7 @@ mariadb:
     replicas: 1
     storage:
       size: 10Gi
-      storageClassName: standard
+      storageClassName: sbs-default
   database:
     name: itop
   auth:

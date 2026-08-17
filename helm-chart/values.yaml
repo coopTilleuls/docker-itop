@@ -28,7 +28,7 @@ mariadb:
     port: 3306
     storage:
       size: 10Gi
-      storageClassName: standard
+      storageClassName: sbs-default
     resources:
       requests:
         cpu: 100m
@@ -73,7 +73,7 @@ securityContext: {}
 
 pvc:
   accessMode: ReadWriteOnce
-  storageClassName: standard
+  storageClassName: sbs-default
   conf:
     size: 1Gi
   data:
