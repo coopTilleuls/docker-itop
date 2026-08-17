@@ -17,4 +17,6 @@ spec:
     storageClassName: {{ .Values.mariadb.instance.storage.storageClassName }}
   resources:
     {{- toYaml .Values.mariadb.instance.resources | nindent 4 }}
+  tls:
+    enabled: false
 {{- end }}
