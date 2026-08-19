@@ -1,0 +1,6 @@
+mariadb:
+  backup:
+    maxRetention: "360h" # 15 jours
+
+    # Reste à compléter quand itop sera réellement déployé en prod : route.host,
+    # mariadb.auth.existingSecret, backup.enabled + storage.s3.bucket (cf values-nonprod.yaml).

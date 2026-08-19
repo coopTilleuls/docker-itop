@@ -6,6 +6,7 @@ mariadb:
     existingSecret: itop-mariadb-auth
   backup:
     enabled: true
+    maxRetention: "72h" # 3 jours
     storage:
       s3:
         bucket: lt-mut-nonprod-scw-itop-mariadb-backup

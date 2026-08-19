@@ -10,6 +10,9 @@ spec:
     name: {{ include "itop-chart.mariadb.fullname" . }}
   target: {{ .Values.mariadb.backup.target }}
   compression: {{ .Values.mariadb.backup.compression }}
+  {{- if .Values.mariadb.backup.maxRetention }}
+  maxRetention: {{ .Values.mariadb.backup.maxRetention | quote }}
+  {{- end }}
   schedule:
     cron: {{ .Values.mariadb.backup.schedule.cron | quote }}
     suspend: {{ .Values.mariadb.backup.schedule.suspend }}

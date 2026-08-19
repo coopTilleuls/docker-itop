@@ -54,6 +54,9 @@ mariadb:
     # forever for a replica that will never exist.
     target: PreferReplica
     compression: gzip
+    # Go duration format (e.g. "72h" for 3 days). No default: retention differs per environment,
+    # set explicitly in values-{env}.yaml.
+    maxRetention: ""
     schedule:
       cron: "0 3 * * *"
       suspend: false

@@ -86,6 +86,7 @@ mariadb:
     enabled: false
     target: PreferReplica # "Replica" (the operator default) would wait forever with replicas: 1
     compression: gzip
+    maxRetention: "" # Go duration (e.g. "72h"), set per environment -- no default
     schedule:
       cron: "0 3 * * *"
     storage:
