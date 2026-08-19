@@ -42,6 +42,31 @@ mariadb:
     # Name of an existing secret with "root-password" and "password" keys.
     # Leave empty to let the chart generate and manage one automatically.
     existingSecret: ""
+  # Scheduled physical backups (mariadb-operator PhysicalBackup, mariabackup-based) to an S3
+  # bucket. Disabled by default: the bucket/credentials secret only exist on environments where
+  # the infra layer created them (opentofu-scaleway-infra-mut, 3_k8s_objects/mariadb_backup.tf,
+  # var.namespaces.itop.create_mariadb_backup = true) -- enable per-environment in
+  # values-{env}.yaml once that secret exists in the release namespace.
+  backup:
+    enabled: false
+    # "PreferReplica" so backups still run with mariadb.instance.replicas = 1 (no replica to
+    # prefer, falls back to the primary) -- the operator default ("Replica") would otherwise wait
+    # forever for a replica that will never exist.
+    target: PreferReplica
+    compression: gzip
+    schedule:
+      cron: "0 3 * * *"
+      suspend: false
+    storage:
+      s3:
+        # Name of an existing secret (created outside this chart) with "ACCESS_KEY_ID" and
+        # "ACCESS_SECRET_KEY" keys.
+        existingSecret: mariadb-backup-credentials
+        endpoint: s3.fr-par.scw.cloud
+        region: fr-par
+        # No default: must be set per-environment (bucket name follows the
+        # "lt-mut-{workspace}-scw-itop-mariadb-backup" convention).
+        bucket: ""
 
 imagePullSecrets: []
 nameOverride: "itop"

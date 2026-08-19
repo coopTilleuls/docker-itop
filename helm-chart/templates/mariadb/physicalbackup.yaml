@@ -1,0 +1,27 @@
+{{- if and .Values.mariadb.enabled .Values.mariadb.backup.enabled }}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: PhysicalBackup
+metadata:
+  name: {{ include "itop-chart.mariadb.fullname" . }}
+  labels:
+    {{- include "itop-chart.labels" . | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ include "itop-chart.mariadb.fullname" . }}
+  target: {{ .Values.mariadb.backup.target }}
+  compression: {{ .Values.mariadb.backup.compression }}
+  schedule:
+    cron: {{ .Values.mariadb.backup.schedule.cron | quote }}
+    suspend: {{ .Values.mariadb.backup.schedule.suspend }}
+  storage:
+    s3:
+      bucket: {{ .Values.mariadb.backup.storage.s3.bucket }}
+      endpoint: {{ .Values.mariadb.backup.storage.s3.endpoint }}
+      region: {{ .Values.mariadb.backup.storage.s3.region }}
+      accessKeyIdSecretKeyRef:
+        name: {{ .Values.mariadb.backup.storage.s3.existingSecret }}
+        key: ACCESS_KEY_ID
+      secretAccessKeySecretKeyRef:
+        name: {{ .Values.mariadb.backup.storage.s3.existingSecret }}
+        key: ACCESS_SECRET_KEY
+{{- end }}

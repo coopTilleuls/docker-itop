@@ -74,6 +74,35 @@ mariadb:
 
 To use an externally managed database instead, set `mariadb.enabled: false` and fill in `environment.db_*`.
 
+#### Scheduled backups (`mariadb.backup`)
+
+When `mariadb.backup.enabled: true`, the chart also creates a `PhysicalBackup` resource
+(`templates/mariadb/physicalbackup.yaml`) that takes a scheduled mariabackup-based snapshot of the
+`MariaDB` instance and uploads it to an S3 bucket:
+
+```yaml
+mariadb:
+  backup:
+    enabled: false
+    target: PreferReplica # "Replica" (the operator default) would wait forever with replicas: 1
+    compression: gzip
+    schedule:
+      cron: "0 3 * * *"
+    storage:
+      s3:
+        existingSecret: mariadb-backup-credentials # keys: ACCESS_KEY_ID, ACCESS_SECRET_KEY
+        endpoint: s3.fr-par.scw.cloud
+        region: fr-par
+        bucket: "" # set per environment
+```
+
+The bucket and the `mariadb-backup-credentials` secret are **not** created by this chart: they
+come from the infra layer (`opentofu-scaleway-infra-mut`, `2_environments/3_k8s_objects/mariadb_backup.tf`),
+provisioned per-namespace when `var.namespaces.<key>.create_mariadb_backup = true`. Only enable
+`mariadb.backup` in an environment's `values-{env}.yaml` once that secret already exists in the
+release namespace, and set `bucket` to the corresponding
+`lt-mut-{workspace}-scw-<key>-mariadb-backup` bucket name.
+
 ### Pod security
 
 In order to allow the iTop service to access the files on the system, adding specific security context for the pod was needed, those can be found in the deployment.yaml file

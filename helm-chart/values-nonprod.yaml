@@ -4,3 +4,8 @@ route:
 mariadb:
   auth:
     existingSecret: itop-mariadb-auth
+  backup:
+    enabled: true
+    storage:
+      s3:
+        bucket: lt-mut-nonprod-scw-itop-mariadb-backup
