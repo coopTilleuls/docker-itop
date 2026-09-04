@@ -104,6 +104,32 @@ provisioned per-namespace when `var.namespaces.<key>.create_mariadb_backup = tru
 release namespace, and set `bucket` to the corresponding
 `lt-mut-{workspace}-scw-<key>-mariadb-backup` bucket name.
 
+### Suspendre / réactiver l'environnement nonprod
+
+En nonprod, l'app et la base ne tournent pas en continu : `values-nonprod.yaml` les laisse en
+standby par défaut (`replicaCount: 0`, `mariadb.instance.suspend: true`,
+`mariadb.backup.schedule.suspend: true`). Les PVC (app + mariadb) restent créés et conservent leurs
+données pendant la suspension — `mariadb.instance.suspend` coupe seulement les pods MariaDB
+(`spec.suspend` sur la CR, `templates/mariadb/mariadb.yaml`), il ne supprime ni la CR ni le PVC,
+contrairement à `mariadb.enabled: false` qui supprime la CR (et très probablement son PVC).
+
+Pour tester l'app, dans `values-nonprod.yaml` :
+
+```yaml
+replicaCount: 1
+
+mariadb:
+  instance:
+    suspend: false
+  backup:
+    schedule:
+      suspend: false
+```
+
+Committer, pousser sur `main` : ArgoCD (`auto_sync: true` côté
+`opentofu-scaleway-infra-mut/2_environments/3_k8s_objects`) resynchronise automatiquement. Une fois
+le test terminé, revert ce commit pour repasser en standby.
+
 ### Pod security
 
 In order to allow the iTop service to access the files on the system, adding specific security context for the pod was needed, those can be found in the deployment.yaml file
