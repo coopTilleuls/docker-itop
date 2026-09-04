@@ -25,6 +25,10 @@ mariadb:
   instance:
     image: mariadb:11.4.3
     replicas: 1
+    # Coupe les pods MariaDB (mariadb-operator ne reconcilie plus la CR) sans supprimer la CR ni
+    # son PVC -- les données survivent à la suspension. Activé par défaut en nonprod (cf
+    # values-nonprod.yaml) : la base ne tourne que pendant les sessions de test de l'app.
+    suspend: false
     port: 3306
     storage:
       size: 10Gi

@@ -6,6 +6,10 @@ metadata:
   labels:
     {{- include "itop-chart.labels" . | nindent 4 }}
 spec:
+  # Coupe les pods MariaDB tout en gardant la CR et le PVC (donc les données) intacts -- utile pour
+  # ne faire tourner la base que pendant les sessions de test de l'app (cf itop-chart, valeur
+  # activée par défaut en nonprod dans values-nonprod.yaml).
+  suspend: {{ .Values.mariadb.instance.suspend }}
   image: {{ .Values.mariadb.instance.image }}
   port: {{ .Values.mariadb.instance.port }}
   replicas: {{ .Values.mariadb.instance.replicas }}
