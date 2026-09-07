@@ -4,11 +4,11 @@ route:
 # Standby par défaut : ni l'app ni la base ne tournent tant qu'on n'a pas explicitement besoin de
 # tester (repasser replicaCount à 1 et mariadb.instance.suspend à false le temps du test, puis
 # revert). Les PVC (app + mariadb) restent créés et conservent leurs données pendant la suspension.
-replicaCount: 0
+replicaCount: 1
 
 mariadb:
   instance:
-    suspend: true
+    suspend: false
   auth:
     existingSecret: itop-mariadb-auth
   backup:
@@ -16,7 +16,7 @@ mariadb:
     # Base suspendue par défaut (cf. instance.suspend ci-dessus) : pas de pod à sauvegarder, donc
     # pas de schedule -- repasser à false en même temps que instance.suspend le temps du test.
     schedule:
-      suspend: true
+      suspend: false
     maxRetention: "72h" # 3 jours
     storage:
       s3:
