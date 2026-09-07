@@ -11,6 +11,11 @@ image:
   repository: rg.fr-par.scw.cloud/infra-mut-cr-scw/itop-apache
   tag: nonprod-0.9.1
 
+# Secret de pull du registry privé Scaleway, créé par argocd_sites.tf dans ce namespace (même
+# convention que le chart otterwiki).
+imagePullSecrets:
+  - name: regcred
+
 # Standby par défaut : ni l'app ni la base ne tournent tant qu'on n'a pas explicitement besoin de
 # tester (repasser replicaCount à 1 et mariadb.instance.suspend à false le temps du test, puis
 # revert). Les PVC (app + mariadb) restent créés et conservent leurs données pendant la suspension.
