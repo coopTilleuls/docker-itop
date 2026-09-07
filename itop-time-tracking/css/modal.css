@@ -1,0 +1,65 @@
+.tt_activity_modal {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.2);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  display: none;
+  -webkit-transition: all 0.3s;
+  -moz-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.tt_activity_modal > div {
+  width: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 2em;
+  background: #ffffff;
+  color: #333333;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.25);
+}
+.tt_activity_modal header {
+  font-weight: bold;
+}
+.tt_activity_modal h1 {
+  font-size: 150%;
+  margin: 0 0 15px;
+  color: #333333;
+}
+.tt_activity_classic {
+  display: block;
+}
+a > .tt_activity_modal_close {
+  color: #aaa;
+  line-height: 50px;
+  font-size: 80%;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  width: 70px;
+  text-decoration: none;
+}
+a > .tt_activity_modal_close:hover {
+  color: #000;
+}
+a > .tt_activity_modal_close_hidden {
+  display: none;
+}
+#timetracking-activity-mode-picker {
+  position: absolute;
+  right: 2px;
+  top: 35px;
+}
+#timetracking-activity-mode-picker a {
+  color: dimgray;
+  text-decoration: none;
+}
+#timetracking-activity-mode-picker a:hover {
+  color: lightslategray;
+  text-decoration: none;
+}

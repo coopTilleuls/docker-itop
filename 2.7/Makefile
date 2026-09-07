@@ -1,6 +1,6 @@
-version = 2.7.8
+version = 2.7.13
 release = $(version)
-patch = 10409
+patch = 18098
 builder = itop_builder
 platforms = linux/arm64,linux/amd64
 
@@ -15,10 +15,7 @@ build: setup_builder
 		--builder $(builder) \
 		--platform $(platforms) \
 		--build-arg release=$(release) \
-		--build-arg patch=$(patch) \
-		-t supervisions/itop:2.7 \
-		-t supervisions/itop:$(version) \
-		-t supervisions/itop:$(release) .
+		--build-arg patch=$(patch) .
 
 load: setup_builder
 	# Build and load current platform

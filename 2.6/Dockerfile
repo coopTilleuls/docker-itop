@@ -1,15 +1,14 @@
 FROM php:7.2-apache
 
-# add helper script
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+# Add helper script
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
 
-# install extra packages
+# Install extra packages
 RUN apt-get update \
 	&& apt-get install -y \
 		graphviz \
 		mariadb-client \
 		unzip \
-	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 		gd \
 		ldap \

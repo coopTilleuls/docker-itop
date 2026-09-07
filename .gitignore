@@ -5,3 +5,7 @@ Essential/files/iTop-essential-docker.tar.gz
 # ignore iTop Professional source and builds
 Professional/files/iTop Professional-*.zip
 Professional/files/iTop-professional-docker.tar.gz
+
+# ignore real production/deployment configs (contain secrets: db_pwd, Mailgun API key, etc.)
+/config-itop-prod.php
+/config-itop-scw.php

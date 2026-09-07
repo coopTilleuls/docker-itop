@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:8.3-apache
 
 # load version info from arguments
 ARG release=3.2.3-2
@@ -14,37 +14,6 @@ RUN apt-get update \
 	mariadb-client \
 	unzip \
 	cron \
-	# Security patch
-	curl \
-	libapr1 \
-	libaprutil1 \
-	libgssapi-krb5-2 \
-	libk5crypto3 \
-	linux-libc-dev \
-	openssl \
-	apache2 \
-	libc-bin \
-	liblua5.3-0 \
-	libncurses6 \
-	libncursesw6 \
-	libnghttp2-14 \
-	libtinfo6 \
-	ncurses-base \
-	ncurses-bin \
-	libc-dev-bin \
-	bsdutils \
-	libblkid1 \
-	libexpat1 \
-	libmount1 \
-	libperl5.32 \
-	libsmartcols1 \
-	libuuid1 \
-	libglib2.0-0 \
-	mount \
-	perl \
-	perl-base \
-	perl-modules-5.32 \
-	util-linux \
 	&& chmod uga+x /usr/local/bin/install-php-extensions \
 	&& install-php-extensions \
 	apcu \

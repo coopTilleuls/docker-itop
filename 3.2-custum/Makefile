@@ -1,6 +1,6 @@
-version = 3.0.2
-release = $(version)-1
-patch = 9957
+version = 3.2.3
+release = $(version)-2
+patch = 20678
 
 all: build push
 
@@ -9,11 +9,11 @@ build:
 		--build-arg release=$(release) \
 		--build-arg patch=$(patch) \
 		-t supervisions/itop \
-		-t supervisions/itop:3.0 \
+		-t supervisions/itop:3.2 \
 		-t supervisions/itop:$(version) \
 		-t supervisions/itop:$(release) .
 
 push:
 	docker push supervisions/itop
-	docker push supervisions/itop:3.0
+	docker push supervisions/itop:3.2
 	docker push supervisions/itop:$(version)

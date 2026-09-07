@@ -1,0 +1,1253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.6">
+    <classes>
+    <class id="Activity" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>addon,searchable,application,bizmodel</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>activity</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field>finalclass</db_final_class_field>
+        <naming>
+          <attributes>
+            <attribute id="obj_class"/>
+            <attribute id="obj_id"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id=""/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="label" xsi:type="AttributeString">
+          <sql>label</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="obj_class" xsi:type="AttributeString">
+          <sql>obj_class</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="obj_id" xsi:type="AttributeObjectKey">
+          <sql>obj_id</sql>
+          <class_attcode>obj_class</class_attcode>
+          <is_null_allowed>false</is_null_allowed>
+          <default_value/>
+        </field>
+        <field id="background_color" xsi:type="AttributeString">
+          <sql>background_color</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="text_color" xsi:type="AttributeString">
+          <sql>text_color</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+      </fields>
+      <methods>
+        <method id="IsTarget">
+          <static>false</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public function IsTarget($sMode)
+	{
+		return static::IsTargetObject(MetaModel::GetObject($this->Get('obj_class'), $this->Get('obj_id')),$sMode);
+	}]]></code>
+        </method>
+        <method id="IsTargetObject">
+          <static>true</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public static function IsTargetObject ($oObject, $sMode)
+	{
+		$sClass = get_class($oObject);
+		$aAllowedClasses = utils::GetConfig()->GetModuleSetting(TimeTrackingView::MODULE_CODE, 'allowed_classes');
+		$bIsTarget = false;
+		$bIsInAllowed = array_key_exists($sClass, $aAllowedClasses) && array_key_exists($sMode, $aAllowedClasses[$sClass]);
+		if ($bIsInAllowed && !empty($aAllowedClasses[$sClass][$sMode]))
+		{
+			$sOQL = $aAllowedClasses[$sClass][$sMode];
+            $oOQL = DBObjectSearch::FromOQL($sOQL);
+            $oOQL->AllowAllData(true);
+            $oOQL->AddCondition('id', $oObject->GetKey() ,'=');
+            $oSet = new DBObjectSet($oOQL, array(), array());
+			while($oAllowedObj= $oSet->Fetch())
+			{
+				if(get_class($oAllowedObj) === get_class($oObject) && $oAllowedObj->GetKey() === $oObject->GetKey())
+				{
+					$bIsTarget = true;
+					break;
+				}
+			}
+		}
+		else if ($bIsInAllowed && empty($aAllowedClasses[$sClass][$sMode]))
+		{
+			$bIsTarget = true;
+		}
+		else if(!$bIsInAllowed)
+		{
+			$aParentClasses = MetaModel::EnumParentClasses($sClass, ENUM_PARENT_CLASSES_ALL, false);
+			foreach ($aParentClasses as $sParentClass)
+			{
+				if( array_key_exists($sParentClass, $aAllowedClasses) && array_key_exists($sMode, $aAllowedClasses[$sParentClass]))
+				{
+					if (!empty($aAllowedClasses[$sParentClass][$sMode]))
+					{
+						$sOQL = $aAllowedClasses[$sParentClass][$sMode];
+                        $oOQL = DBObjectSearch::FromOQL($sOQL);
+                        $oOQL->AllowAllData(true);
+                        $oOQL->AddCondition('id', $oObject->GetKey() ,'=');
+                        $oSet = new DBObjectSet($oOQL, array(), array());
+						while($oAllowedObj= $oSet->Fetch())
+						{
+							if(get_class($oAllowedObj) === get_class($oObject) && $oAllowedObj->GetKey() === $oObject->GetKey())
+							{
+								$bIsTarget = true;
+								break;
+							}
+						}
+					}
+					else if (empty($aAllowedClasses[$sParentClass][$sMode]))
+					{
+						$bIsTarget = true;
+					}
+					break;
+				}
+			}
+		}
+		return $bIsTarget;
+	}]]></code>
+        </method>
+        <method id="GetTargetObjects">
+          <static>true</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public static function GetTargetObjects($sMode)
+	{
+		$aAllowedClasses = utils::GetConfig()->GetModuleSetting(TimeTrackingView::MODULE_CODE, 'allowed_classes');
+		$aTargetObjects = array();
+		foreach($aAllowedClasses as $sClass => $aScopes)
+		{
+			$bIsInAllowed = array_key_exists($sClass, $aAllowedClasses) && array_key_exists($sMode, $aAllowedClasses[$sClass]);
+			if ($bIsInAllowed && !empty($aAllowedClasses[$sClass][$sMode]))
+			{
+				$sOQL = $aAllowedClasses[$sClass][$sMode];
+                $oOQL = DBObjectSearch::FromOQL($sOQL);
+                $oOQL->AllowAllData(true);
+                $oSet = new DBObjectSet($oOQL, array(), array());
+				$aTargetObjects[$sClass] = $oSet->ToArray();
+			}
+			else if ($bIsInAllowed && empty($aAllowedClasses[$sClass][$sMode]))
+			{
+				$sOQL = 'SELECT ' . $sClass;
+                $oOQL = DBObjectSearch::FromOQL($sOQL);
+                $oOQL->AllowAllData(true);
+                $oSet = new DBObjectSet($oOQL, array(), array());
+				$aTargetObjects[$sClass] = $oSet->ToArray();
+			}
+		}
+		return $aTargetObjects;
+	}]]></code>
+        </method>
+        <method id="IsTargetFromCollection">
+          <static>false</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public function IsTargetFromCollection($aCollection)
+	{
+		$bIsTarget = false;
+		foreach($aCollection as $sClass => $oSet)
+		{
+			$aParentClasses = MetaModel::EnumParentClasses($this->Get('obj_class'), ENUM_PARENT_CLASSES_ALL, false);
+			if($this->Get('obj_class') === $sClass)
+			{
+				foreach($oSet as $oAllowedObj)
+				{
+					if($oAllowedObj->GetKey() == $this->Get('obj_id'))
+					{
+						$bIsTarget = true;
+						break;
+					}
+				}
+			}
+			else if(in_array($sClass, $aParentClasses))
+			{
+				foreach($oSet as $oAllowedObj)
+				{
+					if($oAllowedObj->GetKey() === $this->Get('obj_id'))
+					{
+						$bIsTarget = true;
+						break;
+					}
+				}
+			}
+		}
+		return $bIsTarget;
+	}]]></code>
+        </method>
+        <method id="initializeColors">
+          <static>false</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public function initializeColors()
+	{
+		$aColorsParam = utils::GetConfig()->GetModuleSetting(TimeTrackingView::MODULE_CODE, 'colors');
+		if (array_key_exists($this->Get('obj_class'), $aColorsParam['classes']))
+		{
+			$this->Set('background_color', ActivityColors::GetColor($aColorsParam['classes'][$this->Get('obj_class')]['background'], 'background'));
+			$this->Set('text_color', ActivityColors::GetColor($aColorsParam['classes'][$this->Get('obj_class')]['text'], 'text'));
+		}
+		else
+		{
+			$aParentClasses = class_parents($this->Get('obj_class'));
+			foreach ($aParentClasses as $sParentClass)
+			{
+				if(array_key_exists($sParentClass, $aColorsParam['classes']))
+				{
+					$this->Set('background_color', ActivityColors::GetColor($aColorsParam['classes'][$sParentClass]['background'],'background'));
+					$this->Set('text_color', ActivityColors::GetColor($aColorsParam['classes'][$sParentClass]['text'], 'text') );
+					return;
+				}
+			}
+			$this->Set('background_color', ActivityColors::GetColor($aColorsParam['default_calendar']['background'], 'background'));
+			$this->Set('text_color', ActivityColors::GetColor($aColorsParam['default_calendar']['text'], 'text'));
+		}
+	}]]></code>
+        </method>
+        <method id="getFriendlyName">
+          <static>false</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public function getFriendlyName()
+	{
+		$oObj = MetaModel::GetObject($this->Get('obj_class'), $this->Get('obj_id'));
+		if ($oObj != null)
+		{
+			return $oObj->Get('friendlyname');
+		}
+		return $this->Get('obj_class') . ' #' . $this->Get('obj_id');
+	}]]></code>
+        </method>
+         <method id="getOrCreateActivity">
+          <static>true</static>
+          <access>public</access>
+          <type>OQLMenuNode</type>
+          <code><![CDATA[	public static function getOrCreateActivity($iActivity, $sObjClass, $iObjId)
+          {
+            if ($iActivity <= 0 &&
+                $sObjClass &&
+                $iObjId &&
+                (   Activity::IsTargetObject(MetaModel::GetObject($sObjClass, $iObjId), 'calendar-page') ||
+                    Activity::IsTargetObject(MetaModel::GetObject($sObjClass, $iObjId), 'calendar-tab') ||
+                    Activity::IsTargetObject(MetaModel::GetObject($sObjClass, $iObjId), 'report-tab') ||
+                    Activity::IsTargetObject(MetaModel::GetObject($sObjClass, $iObjId), 'stopwatch')
+                ))
+            {
+        
+                $sOQL = 'SELECT Activity WHERE obj_class = :obj_class AND obj_id = :obj_id';
+                $aQueryParams = array('obj_class' => $sObjClass, 'obj_id' => $iObjId);
+                $oOQL = DBObjectSearch::FromOQL($sOQL);
+                $oOQL->AllowAllData(true);
+                $oSet = new DBObjectSet($oOQL, array(), $aQueryParams);
+                $oActivity = $oSet->Fetch();
+                if ($oActivity != null)
+                {
+                    $iActivity = $oActivity->GetKey();
+                }
+                else
+                {
+                    $oActivity = new Activity();
+                    $oActivity->Set('obj_class', $sObjClass);
+                    $oActivity->Set('obj_id',  $iObjId);
+                    $oActivity->initializeColors();
+                    $oActivity->DBInsert();
+                    $iActivity = $oActivity->GetKey();
+                }
+            }
+            return $iActivity;
+        }
+]]></code>
+        </method>
+        <method id="AfterInsert">
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function AfterInsert()
+	{
+		parent::AfterInsert();
+		$this->RefreshFriendlyName();
+	}]]></code>
+        </method>
+          <method id="RefreshFriendlyName">
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function RefreshFriendlyName()
+	{
+		$sFriendlyName = $this->getFriendlyName();
+		$this->Set('label', $sFriendlyName);
+		$this->DBUpdate();
+	}]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="obj_class">
+              <rank>10</rank>
+            </item>
+            <item id="obj_id">
+              <rank>20</rank>
+            </item>
+            <item id="background_color">
+              <rank>30</rank>
+            </item>
+            <item id="text_color">
+              <rank>40</rank>
+            </item>
+          </items>
+        </details>
+        <list>
+          <items>
+            <item id="obj_class">
+              <rank>10</rank>
+            </item>
+            <item id="obj_id">
+              <rank>20</rank>
+            </item>
+            <item id="background_color">
+              <rank>30</rank>
+            </item>
+            <item id="text_color">
+              <rank>40</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+    <class id="FavouriteActivity" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>addon,application,bizmodel</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>favourite_activity</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="user_id"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id=""/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="user_id" xsi:type="AttributeExternalKey">
+          <sql>user_id</sql>
+          <target_class>User</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <jointype/>
+        </field>
+        <field id="activity_id" xsi:type="AttributeExternalKey">
+          <sql>activity_id</sql>
+          <target_class>Activity</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <default_value/>
+        </field>
+        <field id="user_id_finalclass_recall" xsi:type="AttributeExternalField">
+          <extkey_attcode>user_id</extkey_attcode>
+          <target_attcode>finalclass</target_attcode>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+      </fields>
+      <methods/>
+      <presentation/>
+    </class>
+    <class id="UserColorActivity" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>addon,application,bizmodel</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>user_color_activity</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="user_id"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id=""/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="user_id" xsi:type="AttributeExternalKey">
+          <sql>user_id</sql>
+          <target_class>User</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <jointype/>
+        </field>
+        <field id="activity_id" xsi:type="AttributeExternalKey">
+          <sql>activity_id</sql>
+          <target_class>Activity</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <default_value/>
+        </field>
+        <field id="background_color" xsi:type="AttributeText">
+          <sql>title</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="text_color" xsi:type="AttributeText">
+          <sql>text_color</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+      </fields>
+      <methods/>
+      <presentation/>
+    </class>
+    <class id="TimeSpent" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <properties>
+        <category>addon,application,bizmodel</category>
+        <abstract>false</abstract>
+        <icon>img/timespent.png</icon>
+        <key_type>autoincrement</key_type>
+        <db_table>timespent</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field>finalclass</db_final_class_field>
+        <naming>
+          <attributes>
+            <attribute id="contact_id_friendlyname"/>
+            <attribute id="start_date"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id="contact_id"/>
+            <attribute id="duration"/>
+            <attribute id="org_id"/>
+            <attribute id="start_date"/>
+            <attribute id="user_id"/> 
+          </attributes>
+        </reconciliation>
+        <archive>
+          <enabled>true</enabled>
+        </archive>
+      </properties>
+      <fields>
+        <field id="user_id" xsi:type="AttributeExternalKey">
+          <sql>user_id</sql>
+          <target_class>User</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <jointype/>
+        </field>
+        <field id="contact_id" xsi:type="AttributeExternalKey">
+          <sql>contact_id</sql>
+          <target_class>Contact</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <jointype/>
+        </field>
+        <field id="start_date" xsi:type="AttributeDateTime">
+          <sql>start_date</sql>
+          <default_value/>
+          <is_null_allowed>false</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="end_date" xsi:type="AttributeDateTime">
+          <sql>end_date</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="activity_id" xsi:type="AttributeExternalKey">
+          <sql>activity_id</sql>
+          <target_class>Activity</target_class>
+          <is_null_allowed>false</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <default_value/>
+        </field>
+        <field id="activity_label" xsi:type="AttributeExternalField">
+          <extkey_attcode>activity_id</extkey_attcode>
+          <target_attcode>label</target_attcode>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="org_id" xsi:type="AttributeExternalKey">
+          <sql>org_id</sql>
+          <target_class>Organization</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_AUTO</on_target_delete>
+          <jointype/>
+          <default_value/>
+          <class_attcode>org_id</class_attcode>
+        </field>
+        <field id="description" xsi:type="AttributeText">
+          <sql>description</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="title" xsi:type="AttributeString">
+          <sql>title</sql>
+          <default_value/>
+          <is_null_allowed>true</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="origin" xsi:type="AttributeEnum">
+          <values>
+            <value id="calendar">calendar</value>
+            <value id="stopwatch">stopwatch</value>
+            <value id="manual">manual</value>
+          </values>
+          <sql>origin</sql>
+          <default_value>manual</default_value>
+          <is_null_allowed>false</is_null_allowed>
+          <always_load_in_tables/>
+          <tracking_level>none</tracking_level>
+        </field>
+        <field id="duration" xsi:type="AttributeDuration">
+          <sql>duration</sql>
+          <default_value>0</default_value>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="user_id_finalclass_recall" xsi:type="AttributeExternalField">
+          <extkey_attcode>user_id</extkey_attcode>
+          <target_attcode>finalclass</target_attcode>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="contact_id_finalclass_recall" xsi:type="AttributeExternalField">
+          <extkey_attcode>contact_id</extkey_attcode>
+          <target_attcode>finalclass</target_attcode>
+          <is_null_allowed>true</is_null_allowed>
+        </field>
+        <field id="contact_id_obsolescence_flag" xsi:type="AttributeExternalField">
+          <extkey_attcode>contact_id</extkey_attcode>
+          <target_attcode>obsolescence_flag</target_attcode>
+        </field>
+        <field id="org_id_obsolescence_flag" xsi:type="AttributeExternalField">
+          <extkey_attcode>org_id</extkey_attcode>
+          <target_attcode>obsolescence_flag</target_attcode>
+        </field>
+      </fields>
+      <methods>
+        <method id="GetInitialStateAttributeFlags">
+          <static>false</static>
+          <access>public </access>
+          <code><![CDATA[	public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
+	{
+		$iFlags = parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+        $oUser = UserRights::GetUserObject();
+        if((UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser)) && ($sAttCode === 'contact_id' || $sAttCode === 'user_id'))
+        {
+          	return $iFlags;
+        }
+		else if ($sAttCode === 'contact_id' || $sAttCode === 'user_id' || $sAttCode === 'org_id'|| $sAttCode === 'title' || $sAttCode === 'origin' || $sAttCode === 'duration')
+		{
+			$iFlags |= OPT_ATT_READONLY;
+		}
+		return $iFlags;
+	}]]></code>
+        </method>
+        <method id="GetAttributeFlags">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
+	{
+		$iFlags = parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+		$oUser = UserRights::GetUserObject();
+        if((UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser)) && ($sAttCode === 'contact_id' || $sAttCode === 'user_id'))
+        {
+          	return $iFlags;
+        }
+		if ($sAttCode === 'contact_id' || $sAttCode === 'user_id' || $sAttCode === 'activity_id' || $sAttCode === 'org_id'|| $sAttCode === 'title' || $sAttCode === 'origin' || $sAttCode === 'duration')
+		{
+			$iFlags |= OPT_ATT_READONLY;
+		}
+		return $iFlags;
+	}]]></code>
+        </method>
+        <method id="OnUpdate">
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function OnUpdate()
+	{
+		parent::OnUpdate();
+		$aChanges = $this->ListChanges();
+		if (array_key_exists('start_date', $aChanges) || array_key_exists('end_date', $aChanges) )
+		{
+			$this->UpdateDuration();
+		}
+	}]]></code>
+        </method>
+        <method id="OnInsert">
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function OnInsert()
+	{
+		parent::OnInsert();
+		
+		//Set an end time if needed
+		if($this->Get('finalclass') === 'TimeSpent' && $this->Get('end_date') === null)
+		{
+			$sMinimumEventDuration = utils::GetConfig()->GetModuleSetting(TimeTrackingView::MODULE_CODE, 'minimum_event_duration_display', '00:00:00');
+            $oStartDate = new DateTime($this->Get('start_date'));
+
+            $oEndDate = clone $oStartDate;
+            $aMinimumEventDuration = explode(':', $sMinimumEventDuration);
+            $oEndDate->add(new DateInterval('PT'.$aMinimumEventDuration[0].'H'))->add(new DateInterval('PT'.$aMinimumEventDuration[1].'M'))->add(new DateInterval('PT'.$aMinimumEventDuration[2].'S'));
+            
+            $this->Set('end_date', $oEndDate->format('Y-m-d H:i:s'));
+        }
+		
+		//Set the current user
+		$this->SetIfNull('user_id',  UserRights::GetUserId());
+
+		//Set current user's contact
+		$this->SetIfNull('contact_id', UserRights::GetContactId());
+		
+		//Update duration if different rules need to be applied
+		$this->UpdateDuration();
+		
+		//Update activity friendlyname
+		$oActivity = MetaModel::GetObject('Activity', $this->Get('activity_id'));
+		$oActivity->RefreshFriendlyName();
+		
+		//Set default title
+        $this->SetIfNull('title',  $oActivity->GetFriendlyName());
+        
+        //Set org id
+		$this->SetIfNull('org_id', $this->GetOrganization());
+	}]]></code>
+        </method>
+        <method id="UpdateDuration">
+          <static>false</static>
+          <access>protected</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	protected function UpdateDuration()
+	{
+		if(!empty($this->Get('start_date')) && !empty($this->Get('end_date')))
+		{
+		    $oStartDate = DateTime::createFromFormat(AttributeDateTime::GetInternalFormat(), $this->Get('start_date'));
+		    $oEndDate = DateTime::createFromFormat(AttributeDateTime::GetInternalFormat(), $this->Get('end_date'));
+			$this->Set('duration', $oEndDate->getTimestamp() - $oStartDate->getTimestamp());
+		}
+	}]]></code>
+        </method>
+        <method id="GetColor">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function GetColor()
+	{
+		$aColorsParam = MetaModel::GetModuleSetting(TimeTrackingView::MODULE_CODE, 'colors');
+		$sBGColor = '';
+		$sTextColor = '';
+
+		if ($this->Get('origin') === 'calendar')
+		{
+			if ($this->Get('user_id') == UserRights::GetUserId())
+			{
+			    $sOQL = 'SELECT UserColorActivity WHERE activity_id = :activity_id AND user_id = :user_id';
+				$aQueryParams = array('activity_id' => $this->Get('activity_id'), 'user_id' => UserRights::GetUserId());
+				$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), $aQueryParams);
+				$oUserColorActivity = $oSet->Fetch();
+				if ($oUserColorActivity != null)
+				{
+			    	$sBGColor = $oUserColorActivity->Get('background_color');
+                    $sTextColor = $oUserColorActivity->Get('text_color');
+				}
+				else
+				{
+                  $sOQL = 'SELECT Activity WHERE id = :activity_id';
+                  $aQueryParams = array('activity_id' => $this->Get('activity_id'));
+                  $oSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL), array(), $aQueryParams);
+                  $oActivity = $oSet->Fetch();
+                  if ($oActivity != null)
+                  {
+                      $sBGColor = $oActivity->Get('background_color');
+                      $sTextColor = $oActivity->Get('text_color');
+                  }
+				}	
+			}
+			else
+			{
+				$sBGColor = ActivityColors::GetColor($aColorsParam['default_calendar']['background']);
+				$sTextColor = ActivityColors::GetColor($aColorsParam['default_calendar']['text']);
+			}
+		}
+		else if ($this->Get('origin') === 'stopwatch')
+		{
+			$sBGColor = ActivityColors::GetColor($aColorsParam['default_stopwatch']['background']);
+			$sTextColor = ActivityColors::GetColor($aColorsParam['default_stopwatch']['text']);
+		}
+
+		return array($sBGColor, $sTextColor);
+	}]]></code>
+        </method>
+         <method id="GetOrganization">
+          <static>false</static>
+          <access>public</access>
+          <type>Overload-DBObject</type>
+          <code><![CDATA[	public function GetOrganization()
+	{
+		$iOrgId = null;
+		$iActivityId = $this->Get('activity_id');
+		if(!empty($iActivityId))
+		{
+		  $oActivity = MetaModel::GetObject('Activity', $iActivityId);
+		  $oActivityObject = MetaModel::GetObject($oActivity->Get('obj_class'), $oActivity->Get('obj_id'));
+		  if(MetaModel::IsValidAttCode($oActivity->Get('obj_class'), 'org_id'))
+		  {
+		     $iOrgId = $oActivityObject->Get('org_id');
+		  }
+		}
+		return $iOrgId;
+	}]]></code>
+        </method>
+        <method id="PrefillCreationForm">
+            <static>false</static>
+	        <access>public</access>
+	        <type>Overload-DBObject</type>
+      		<arguments>
+		    <argument id="1">
+			<type>reference</type>
+			<mandatory>true</mandatory>
+		    </argument>
+		</arguments>
+	        <code><![CDATA[public function PrefillCreationForm(&$aContextParam)
+		{	
+		    $oStartDate = new DateTime();
+		    if(isset($aContextParam['start-timestamp'])){
+                $oStartDate->setTimestamp($aContextParam['start-timestamp']);
+            }
+            $this->Set('start_date',  $oStartDate->format('Y-m-d H:i:s'));
+            if(!isset($aContextParam['time-tracking-step']) || (isset($aContextParam['time-tracking-step']) && $aContextParam['time-tracking-step'] !== 'start-stopwatch'))
+            {
+                $oEndDate = new DateTime();
+                if(isset($aContextParam['end-timestamp'])){
+                  $oEndDate->setTimestamp($aContextParam['end-timestamp']);
+                }
+                $this->Set('end_date',  $oEndDate->format('Y-m-d H:i:s'));
+            }
+            $this->Set('description',  '');
+            $this->Set('origin', 'calendar');
+            $this->Set('user_id',  UserRights::GetUserId());
+            $this->Set('contact_id', UserRights::GetContactId());
+		}]]>
+	        </code>
+	    </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:TimeSpent:Edition">
+                  <items>
+                    <item id="start_date">
+                      <rank>10</rank>
+                    </item>
+                    <item id="end_date">
+                      <rank>20</rank>
+                    </item>
+                    <item id="description">
+                      <rank>30</rank>
+                    </item>
+                    <item id="activity_id">
+                      <rank>40</rank>
+                    </item>
+                    <item id="activity_label">
+                      <rank>50</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+              </items>
+              <rank>10</rank>
+            </item>
+            <item id="col:col1">
+              <items>
+                <item id="fieldset:TimeSpent:Information">
+                  <items>
+                    <item id="title">
+                      <rank>10</rank>
+                    </item>
+                    <item id="org_id">
+                      <rank>20</rank>
+                    </item>
+                    <item id="user_id">
+                      <rank>30</rank>
+                    </item>
+                    <item id="contact_id">
+                      <rank>40</rank>
+                    </item>
+                    <item id="duration">
+                      <rank>50</rank>
+                    </item>
+                    <item id="origin">
+                      <rank>60</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+              </items>
+              <rank>20</rank>
+            </item>
+          </items>
+        </details>
+        <list>
+          <items>
+            <item id="activity_label">
+              <rank>10</rank>
+            </item>
+            <item id="org_id">
+              <rank>20</rank>
+            </item>
+            <item id="user_id">
+              <rank>30</rank>
+            </item>
+            <item id="duration">
+              <rank>40</rank>
+            </item>
+          </items>
+        </list>
+        <search>
+          <items>
+            <item id="contact_id">
+              <rank>10</rank>
+            </item>
+            <item id="org_id">
+              <rank>20</rank>
+            </item>
+            <item id="title">
+              <rank>30</rank>
+            </item>
+            <item id="start_date">
+              <rank>40</rank>
+            </item>
+            <item id="user_id">
+              <rank>50</rank>
+            </item>
+          </items>
+        </search>
+        <default_search>
+          <items>
+            <item id="contact_id">
+              <rank>10</rank>
+            </item>
+            <item id="org_id">
+              <rank>20</rank>
+            </item>
+            <item id="start_date">
+              <rank>30</rank>
+            </item>
+            <item id="title">
+              <rank>40</rank>
+            </item>
+          </items>
+        </default_search>
+      </presentation>
+    </class>
+    <class id="TimeSpentBackground" _delta="define">
+      <parent>TimeSpent</parent>
+      <properties>
+        <category>addon,application,bizmodel</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>timespent_background</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+          <attributes>
+            <attribute id="contact_id_friendlyname"/>
+            <attribute id="start_date"/>
+          </attributes>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes>
+            <attribute id=""/>
+          </attributes>
+        </reconciliation>
+      </properties>
+      <fields>
+        <field id="status" xsi:type="AttributeEnum">
+          <values>
+            <value>ongoing</value>
+            <value>stopped</value>
+            <value>force-stopped</value>
+          </values>
+          <sql>status</sql>
+          <default_value>ongoing</default_value>
+          <is_null_allowed>false</is_null_allowed>
+        </field>
+      </fields>
+      <methods/>
+      <presentation>
+        <details>
+          <items>
+            <item id="col:col0">
+              <items>
+                <item id="fieldset:TimeSpent:Edition">
+                  <items>
+                    <item id="start_date">
+                      <rank>10</rank>
+                    </item>
+                    <item id="end_date">
+                      <rank>20</rank>
+                    </item>
+                    <item id="description">
+                      <rank>30</rank>
+                    </item>
+                    <item id="activity_id">
+                      <rank>40</rank>
+                    </item>
+                    <item id="activity_label">
+                      <rank>50</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+              </items>
+              <rank>10</rank>
+            </item>
+            <item id="col:col1">
+              <items>
+                <item id="fieldset:TimeSpent:Information">
+                  <items>
+                    <item id="title">
+                      <rank>10</rank>
+                    </item>
+                    <item id="org_id">
+                      <rank>20</rank>
+                    </item>
+                    <item id="user_id">
+                      <rank>30</rank>
+                    </item>
+                    <item id="contact_id">
+                      <rank>40</rank>
+                    </item>
+                    <item id="duration">
+                      <rank>50</rank>
+                    </item>
+                    <item id="origin">
+                      <rank>60</rank>
+                    </item>
+                  </items>
+                  <rank>10</rank>
+                </item>
+              </items>
+              <rank>20</rank>
+            </item>
+          </items>
+        </details>
+      </presentation>
+    </class>
+    <class id="TriggerOnForceStopTimeSpentBackground" _delta="define">
+      <parent>cmdbAbstractObject</parent>
+      <php_parent>
+        <name>TriggerOnObject</name>
+      </php_parent>
+      <properties>
+        <category>core/cmdb,application</category>
+        <abstract>false</abstract>
+        <key_type>autoincrement</key_type>
+        <db_table>priv_trigger_onforcestoptimespentbackground</db_table>
+        <db_key_field>id</db_key_field>
+        <db_final_class_field/>
+        <naming>
+          <attributes>
+            <attribute id="description"/>
+          </attributes>
+        </naming>
+        <display_template/>
+        <icon/>
+        <reconciliation>
+          <attributes/>
+        </reconciliation>
+      </properties>
+      <fields/>
+      <methods>
+        <method id="OnInsert">
+          <static>false</static>
+          <access>public</access>
+          <code><![CDATA[	public function OnInsert()
+    {
+        parent::OnInsert();
+        $this->Set('target_class', 'TimeSpentBackground');
+    }]]></code>
+        </method>
+      </methods>
+      <presentation>
+        <details>
+          <items>
+            <item id="description">
+              <rank>10</rank>
+            </item>
+            <item id="filter">
+              <rank>30</rank>
+            </item>
+            <item id="action_list">
+              <rank>40</rank>
+            </item>
+          </items>
+        </details>
+        <list>
+          <items>
+            <item id="finalclass">
+              <rank>10</rank>
+            </item>
+            <item id="target_class">
+              <rank>20</rank>
+            </item>
+            <item id="description">
+              <rank>30</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+  </classes>
+  <menus>
+    <menu id="TimeTracking" xsi:type="MenuGroup" _delta="define">
+      <rank>65</rank>
+      <enable_class>TimeSpent</enable_class>
+      <enable_action>UR_ACTION_MODIFY</enable_action>
+      <style>
+        <decoration_classes>fas fa-user-clock</decoration_classes>
+      </style>
+    </menu>
+    <menu id="TimeTrackingPage" xsi:type="WebPageMenuNode" _delta="define">
+      <rank>1</rank>
+      <parent>TimeTracking</parent>
+      <url>calendar-tracking.php</url>
+      <enable_class>TimeSpent</enable_class>
+      <enable_action>UR_ACTION_MODIFY</enable_action>
+    </menu>
+    <menu id="MyTimeTrackingReport" xsi:type="WebPageMenuNode" _delta="define">
+      <rank>10</rank>
+      <parent>TimeTracking</parent>
+      <url>$pages/exec.php?exec_module=itop-time-tracking&amp;exec_page=report.php&amp;mode=self</url>
+      <enable_class>TimeSpent</enable_class>
+      <enable_action>UR_ACTION_MODIFY</enable_action>
+    </menu>
+    <menu id="TimeTrackingReport" xsi:type="WebPageMenuNode" _delta="define">
+      <rank>20</rank>
+      <parent>TimeTracking</parent>
+      <url>$pages/exec.php?exec_module=itop-time-tracking&amp;exec_page=report.php</url>
+      <enable_class>TimeSpent</enable_class>
+      <enable_action>UR_ACTION_BULK_DELETE</enable_action>
+    </menu>
+  </menus>
+  <user_rights>
+    <profiles>
+      <profile id="49" _delta="define">
+        <name>Time Tracker</name>
+        <description>Person allowed to track his time</description>
+        <groups>
+          <group id="TimeTracking">
+            <actions>
+              <action id="action:write">allow</action>
+              <action id="action:delete">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
+      <profile id="50" _delta="define">
+        <name>Time Tracking Manager</name>
+        <description>Person allowed to see time tracked by everybody. </description>
+        <groups>
+          <group id="TimeTracking">
+            <actions>
+              <action id="action:write">allow</action>
+              <action id="action:bulk write">allow</action>
+              <action id="action:delete">allow</action>
+              <action id="action:bulk delete">allow</action>
+            </actions>
+          </group>
+        </groups>
+      </profile>
+    </profiles>
+    <groups>
+      <group id="TimeTracking" _delta="define">
+        <classes>
+          <class id="TimeSpent"/>
+          <class id="Activity"/>
+          <class id="FavouriteActivity"/>
+          <class id="UserColorActivity"/>
+        </classes>
+      </group>
+    </groups>
+  </user_rights>
+  <snippets>
+    <snippet id="TimeTrackingRightsPlugin" _delta="define">
+      <placement>module</placement>
+      <module>itop-time-tracking</module>
+      <rank>-1</rank>
+      <content>
+        <![CDATA[
+class TimeTrackingRightsPlugin implements iApplicationObjectExtension
+{
+
+	public function OnIsModified($oObject)
+	{
+		return false;
+	}
+
+	public function OnCheckToWrite($oObject)
+	{
+		$iMaxEventAge = utils::GetConfig()->GetModuleSetting(TimeTrackingView::MODULE_CODE, 'delete_max_event_age', 30);
+
+		$aError = array();
+		if($oObject instanceof TimeSpent)
+		{
+		    $oUser = UserRights::GetUserObject();
+		
+            //Check if the timespent is not too old
+			$sNow = time();
+			$sEndDate = strtotime($oObject->Get('end_date'));
+			if(empty($oObject->Get('end_date')))
+			{
+			    $sEndDate = strtotime($oObject->Get('start_date'));
+			}
+			
+			$iDateDiff = round(($sNow - $sEndDate) / (60 * 60 * 24));
+			if ($iMaxEventAge != 0 && $iDateDiff > $iMaxEventAge && 
+			!(UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser)))
+			{
+				$aError[] = Dict::S('TimeTracking:Error:UpdateExpired');
+			}
+			
+			//Check user rights on the timespent
+            if(!$oObject->Get('user_id') == UserRights::GetUserId() && 
+            !(UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser)))
+            {
+                $aError[] = Dict::S('TimeTracking:Error:UpdateRights');
+            }
+			
+		}
+		return $aError;
+	}
+
+	public function OnCheckToDelete($oObject)
+	{
+		$iMaxEventAge = utils::GetConfig()->GetModuleSetting(TimeTrackingView::MODULE_CODE, 'delete_max_event_age', 30);
+
+		$aError = array();
+		if($oObject instanceof TimeSpent)
+		{
+            $oUser = UserRights::GetUserObject();
+
+            //Check if the timespent is not too old
+			$sNow = time();
+			$sEndDate = strtotime($oObject->Get('end_date'));
+			if(empty($oObject->Get('end_date')))
+			{
+			    $sEndDate = strtotime($oObject->Get('start_date'));
+			}
+			
+			$iDateDiff = round(($sNow - $sEndDate) / (60 * 60 * 24));
+			if ($iMaxEventAge != 0 && $iDateDiff > $iMaxEventAge && 
+			!(UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser)))
+			{
+				$aError[] = Dict::S('TimeTracking:Error:DeleteExpired');
+			}
+			
+			//Check user rights on the timespent
+            if(!($oObject->Get('user_id') == UserRights::GetUserId()) && 
+            !(UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser)))
+            {
+                $aError[] = Dict::S('TimeTracking:Error:DeleteRights');
+            }
+			
+		}
+		return $aError;
+	}
+
+	public function OnDBUpdate($oObject, $oChange = null)
+	{
+	}
+
+	public function OnDBInsert($oObject, $oChange = null)
+	{
+	}
+
+	public function OnDBDelete($oObject, $oChange = null)
+	{
+	}
+	
+	public static function HasStopwatchDisplayRights($oUser)
+	{
+	  return UserRights::HasProfile('Time Tracker', $oUser) ||  UserRights::IsAdministrator($oUser);
+	}	
+	
+	public static function HasTimeTrackingTabDisplayRights($oUser)
+	{
+		  return UserRights::HasProfile('Time Tracker', $oUser) ||  UserRights::IsAdministrator($oUser);
+	}	
+	
+    public static function HasTimeTrackingReportTabDisplayRights($oUser)
+	{
+		  return UserRights::HasProfile('Time Tracker', $oUser) ||  UserRights::IsAdministrator($oUser);
+	}
+	
+    public static function HasAllReportDisplayRights($oUser)
+	{
+	  return UserRights::HasProfile('Time Tracking Manager', $oUser) || UserRights::IsAdministrator($oUser);
+	}
+}
+        ]]>
+      </content>
+    </snippet>
+  </snippets>
+</itop_design>

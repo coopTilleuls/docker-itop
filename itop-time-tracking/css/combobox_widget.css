@@ -1,0 +1,138 @@
+
+.custom-combobox {
+    position: relative;
+}
+
+.tt_activity_classic .custom-combobox
+{
+    margin-left: 30%
+}
+.tt_activity_modal .custom-combobox input
+{
+    width: 80%;
+}
+
+.tt_activity_modal > div
+{
+    width: 45%;
+}
+.tt_activity_modal > div > button
+{
+    display: block;
+    position: relative;
+    float: right;
+}
+
+.custom-combobox > input {
+    position: relative;
+    padding: 5px;
+    margin: 20px;
+    align-content: center;
+    left: auto;
+    width: auto;
+}
+
+.container-combobox label {
+    padding-left: 0;
+    font-size: 14px;
+}
+
+.custom-combobox a {
+    position: absolute;
+    margin: 20px 20px 20px 0px;
+    right: 1px;
+    top: -23px;
+}
+
+.custom-combobox-toggle:hover, .custom-combobox-toggle:focus, .custom-combobox-toggle:active {
+    cursor: pointer;
+}
+
+.custom-combobox-input {
+    min-width: 40%;
+}
+
+.ui-autocomplete {
+    max-height: 300px;
+    overflow-y: auto;
+    width: 20em;
+    overflow-x: hidden;
+}
+
+.container-combobox .ui-button-text-only, .container-combobox .ui-button-text	{
+    border: none;
+    padding: 0;
+}
+
+.custom-combobox-toggle{
+    border: none;
+    padding: 3px 4px 3px 30px;
+}
+
+.custom-combobox-possible-activity-toggle
+{
+    padding: 3px 4px 3px 4px;
+}
+
+.combobox_widget_list .ui-menu-item{
+    padding: 2px 8px;
+}
+.combobox_widget_list .ui-state-focus
+{
+    border: none;
+    font-weight: normal;
+    color: #000;
+    padding: 2px 8px;
+    margin : 0;
+}
+.combobox_widget_list .ui-state-focus a {
+    color: #000;
+}
+
+.ui-autocomplete-category, .ui-autocomplete-class {
+    font-weight: bold !important;
+    padding: .2em .4em !important;
+    margin: .8em 0 .2em !important;
+    line-height: 1.5 !important;
+}
+.tt-activity-color{
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-radius: 8px;
+    margin: 0px 4px;
+    line-height: 8px;
+    vertical-align: 1px;
+}
+
+#time-tracking-like-button{
+    color: #444444;
+    position: absolute;
+    padding: 0px;
+    margin: 24px;
+    right: 27px;
+    font-size: 15px;
+    z-index: 1;
+    top: -23px;
+}
+
+#time-tracking-like-button.time-tracking-is-favorite{
+    color: #e2264d;
+    animation: pulse 1s 1;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    50% { transform: scale(1.25); }
+    to { transform: scale(1); }
+}
+
+/*Possible activity list*/
+
+#tt-submit-add-activity
+{
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+}
+

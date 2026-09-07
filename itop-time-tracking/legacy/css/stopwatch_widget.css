@@ -1,0 +1,120 @@
+
+#stopwatch_view
+{
+    position: fixed;
+    right: 0;
+    top: 20%;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.19), 0 2px 6px rgba(0,0,0,0.23);
+    z-index: 1200;
+    overflow: hidden;
+    transition: all 0.2s ease-in;
+}
+
+.stopwatch-bookmark.stopwatch-bookmark-show.stopwatch-bookmark-on
+{
+    color: #23ae26;
+}
+
+.stopwatch-view-hidden
+{
+    max-height: 28px;
+    max-width: 28px;
+}
+.stopwatch-view-show
+{
+    max-height: 700px;
+    max-width: 400px;
+}
+.stopwatch-bookmark{
+    float: right;
+    padding: 7px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.stopwatch-bookmark-show .stopwatch-bookmark-close-icon,
+.stopwatch-bookmark-hide .stopwatch-bookmark-open-icon{
+    display: none;
+}
+.stopwatch-content{
+    width: 200px;
+    margin-top: 21px;
+}
+.stopwatch-content > *
+{
+    padding: 7px;
+}
+.tt_stopwatch_history_origin_calendar::before
+{
+    content:'\f073';
+    font-family: "FontAwesome", "Font Awesome 5 Free";
+}
+.tt_stopwatch_history_origin_stopwatch::before
+{
+    content: '\f017';
+    font-family: "FontAwesome", "Font Awesome 5 Free";
+}
+.tt_stopwatch_history_origin_manual::before
+{
+    content: '\f25a';
+    font-family: "FontAwesome", "Font Awesome 5 Free";
+}
+.stopwatch-history > div
+{
+    padding: 7px 0px;
+    text-align: center;
+}
+
+.tt_stopwatch_history_contact {
+    width: 25px;
+    height: 25px;
+    background-color: #EEE;
+    border-radius: 25px;
+    text-align: center;
+    line-height: 25px;
+    background-size: 100%;
+    background-position: center center;
+}
+.stopwatch-history
+{
+    max-height: 300px;
+    overflow: auto;
+    padding: 0px;
+    border-top: solid 1px lightgray;
+}
+.stopwatch-history > div > div
+ {
+     margin: 0px 7px;
+     display: inline-block;
+    vertical-align: middle;
+ }
+.stopwatch-history-even
+{
+    background-color: #f1f1f1;
+}
+.stopwatch-msg-alert
+{
+    color:#f3424b;
+}
+.stopwatch-msg, .stopwatch-time, .stopwatch-button-bar
+{
+    text-align: center;
+}
+.stopwatch-msg > .stopwatch-friendlyname, .stopwatch-time{
+    font-size: 20px;
+    display: block;
+}
+.stopwatch-button-bar > *
+{
+    font-size: 20px;
+    padding: 7px;
+    cursor: pointer;
+    margin: 0px 5px;
+}
+.stopwatch-history > .stopwatch-date-line {
+    padding: 10px 0px;
+    color: #6c6c6c;
+    font-size: 13px;
+    font-style: italic;
+}

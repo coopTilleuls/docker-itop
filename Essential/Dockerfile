@@ -1,26 +1,28 @@
-FROM php:7.4-apache
+FROM php:8.1-apache
 
-# load version info from arguments
+# Load version info from arguments
 ARG release
 ARG patch
 
-# add helper script
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+# Add helper script
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
 
-# install extra packages
+# Install extra packages
+# hadolint ignore=DL3008,DL3009
 RUN apt-get update \
-	&& apt-get install -y \
+	&& apt-get install -y --no-install-recommends \
 		graphviz \
 		mariadb-client \
 		unzip \
-	&& chmod uga+x /usr/local/bin/install-php-extensions && \
-    install-php-extensions \
+	&& install-php-extensions \
+		apcu \
 		gd \
+		imap \
 		ldap \
 		mcrypt \
 		mysqli \
 		soap \
-		zip 
+		zip
 
 # Load iTop files
 COPY ["files/iTop Essential-${release}-${patch}.zip", "/tmp/iTop.zip"]
