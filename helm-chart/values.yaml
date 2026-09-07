@@ -89,7 +89,8 @@ serviceAccount:
   name: ""
 
 container:
-  port: 80
+  # Apache écoute sur 8080 dans l'image custom (3.2-custum/ports.conf + apache2.conf), pas 80.
+  port: 8080
 podAnnotations: {}
 
 podSecurityContext: {}
@@ -120,7 +121,9 @@ pvc:
 service:
   type: ClusterIP
   port: 80
-  targetPort: 80
+  # Doit matcher container.port (8080, cf ci-dessus) : c'est le port réellement écouté par Apache
+  # dans le conteneur, pas le port exposé par le Service.
+  targetPort: 8080
 
 route:
   enabled: true
