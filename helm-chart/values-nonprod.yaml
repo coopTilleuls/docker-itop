@@ -1,6 +1,16 @@
 route:
   host: itop.lt-mut-nonprod-scw.les-tilleuls.solutions
 
+# Repository forcé ici (pas laissé au seul défaut du chart, qui pointe vers l'image communautaire
+# supervisions/itop) : ArgoCD Image Updater corrèle son imageName configuré avec l'image *live*
+# rapportée par l'Application pour démarrer le suivi -- tant que le live ne matche jamais
+# rg.fr-par.scw.cloud/infra-mut-cr-scw/itop-apache, il ignore silencieusement cette Application à
+# chaque cycle (jamais de premier patch de spec.source.helm.parameters). Le tag ci-dessous n'est
+# qu'un point de départ, écrasé ensuite par l'Image Updater (write-back "argocd").
+image:
+  repository: rg.fr-par.scw.cloud/infra-mut-cr-scw/itop-apache
+  tag: nonprod-0.9.1
+
 # Standby par défaut : ni l'app ni la base ne tournent tant qu'on n'a pas explicitement besoin de
 # tester (repasser replicaCount à 1 et mariadb.instance.suspend à false le temps du test, puis
 # revert). Les PVC (app + mariadb) restent créés et conservent leurs données pendant la suspension.
