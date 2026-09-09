@@ -6,11 +6,11 @@ data:
   config-itop.php: |
     <?php
     $MySettings = array(
-            'db_host'    => $_ENV['DB_HOSTNAME'],
-            'db_name'    => $_ENV['DB_ENV_MYSQL_DATABASE'],
-            'db_user'    => $_ENV['DB_ENV_MYSQL_USER'],
-            'db_pwd'     => $_ENV['DB_ENV_MYSQL_PASSWORD'],
-            'db_subname' => $_ENV['DB_PREFIX'],
+            'db_host'    => getenv('DB_HOSTNAME'),
+            'db_name'    => getenv('DB_ENV_MYSQL_DATABASE'),
+            'db_user'    => getenv('DB_ENV_MYSQL_USER'),
+            'db_pwd'     => getenv('DB_ENV_MYSQL_PASSWORD'),
+            'db_subname' => getenv('DB_PREFIX'),
     );
     
     $MyModuleSettings = array();
