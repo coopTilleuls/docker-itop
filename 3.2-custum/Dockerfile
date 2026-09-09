@@ -27,8 +27,8 @@ RUN apt-get update \
 	&& rm -rf /var/cache/apt
 
 # Load iTop files
-RUN mkdir -p /tmp/web && curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
-	&& unzip /tmp/iTop.zip -d /tmp/web/  \
+RUN curl -L -o /tmp/iTop.zip https://sourceforge.net/projects/itop/files/itop/${release}/iTop-${release}-${patch}.zip \
+	&& unzip /tmp/iTop.zip -d /tmp/ web/* \
 	&& mv -v /tmp/web/* /var/www/html/ \
 	&& mkdir /var/www/html/env-production \
 	&& chown -R www-data: /var/www/html/ \
