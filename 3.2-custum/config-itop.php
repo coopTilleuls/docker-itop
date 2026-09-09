@@ -6,6 +6,7 @@ $MySettings = array(
 	'db_user'    => getenv('DB_ENV_MYSQL_USER'),
 	'db_pwd'     => getenv('DB_ENV_MYSQL_PASSWORD'),
 	'db_subname' => getenv('DB_PREFIX'),
+	'behind_reverse_proxy' => true,
 );
 
 $MyModuleSettings = array();
