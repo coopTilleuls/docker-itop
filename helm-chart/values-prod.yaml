@@ -1,7 +1,7 @@
 route:
   host: support.les-tilleuls.coop
   extraHosts: 
-    - itop.lt-mut-nonprod-scw.les-tilleuls.solutions
+    - itop.lt-mut-prod-scw.les-tilleuls.solutions
 mage:
   repository: rg.fr-par.scw.cloud/infra-mut-cr-scw/itop-apache
   tag: nonprod-0.9.9
