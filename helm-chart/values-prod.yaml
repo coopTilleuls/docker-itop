@@ -1,6 +1,29 @@
-mariadb:
-  backup:
-    maxRetention: "360h" # 15 jours
+image:
+  repository: rg.fr-par.scw.cloud/infra-mut-cr-scw/itop-apache
+  tag: nonprod-0.9.9
 
-    # Reste à compléter quand itop sera réellement déployé en prod : route.host,
-    # mariadb.auth.existingSecret, backup.enabled + storage.s3.bucket (cf values-nonprod.yaml).
+# Secret de pull du registry privé Scaleway, créé par argocd_sites.tf dans ce namespace (même
+# convention que le chart otterwiki).
+imagePullSecrets:
+  - name: regcred
+
+# Standby par défaut : ni l'app ni la base ne tournent tant qu'on n'a pas explicitement besoin de
+# tester (repasser replicaCount à 1 et mariadb.instance.suspend à false le temps du test, puis
+# revert). Les PVC (app + mariadb) restent créés et conservent leurs données pendant la suspension.
+replicaCount: 1
+
+mariadb:
+  instance:
+    suspend: false
+  auth:
+    existingSecret: itop-mariadb-auth
+  backup:
+    enabled: true
+    # Base suspendue par défaut (cf. instance.suspend ci-dessus) : pas de pod à sauvegarder, donc
+    # pas de schedule -- repasser à false en même temps que instance.suspend le temps du test.
+    schedule:
+      suspend: false
+    maxRetention: "72h" # 3 jours
+    storage:
+      s3:
+        bucket: lt-mut-nonprod-scw-itop-mariadb-backup
