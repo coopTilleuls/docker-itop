@@ -15,8 +15,6 @@ replicaCount: 1
 mariadb:
   instance:
     suspend: false
-  auth:
-    existingSecret: itop-mariadb-auth
   backup:
     enabled: true
     # Base suspendue par défaut (cf. instance.suspend ci-dessus) : pas de pod à sauvegarder, donc
