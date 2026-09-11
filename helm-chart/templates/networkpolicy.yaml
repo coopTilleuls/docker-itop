@@ -50,3 +50,5 @@ spec:
           protocol: TCP
         - port: 465
           protocol: TCP
+        - port: 587 # smtp.eu.mailgun.org
+          protocol: TCP
