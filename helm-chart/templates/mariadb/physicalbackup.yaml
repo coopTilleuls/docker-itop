@@ -28,6 +28,10 @@ spec:
       bucket: {{ .Values.mariadb.backup.storage.s3.bucket }}
       endpoint: {{ .Values.mariadb.backup.storage.s3.endpoint }}
       region: {{ .Values.mariadb.backup.storage.s3.region }}
+      # Without this, mariadb-operator defaults to plain HTTP to reach S3, which the
+      # allow-database-backup NetworkPolicy (egress port 443 only) blocks.
+      tls:
+        enabled: true
       accessKeyIdSecretKeyRef:
         name: {{ .Values.mariadb.backup.storage.s3.existingSecret }}
         key: ACCESS_KEY_ID
