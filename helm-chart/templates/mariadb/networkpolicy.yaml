@@ -18,6 +18,10 @@ spec:
         - podSelector:
             matchLabels:
               {{- include "itop-chart.selectorLabels" . | nindent 14 }}
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: mariadb-backup
+              app.kubernetes.io/instance: {{ include "itop-chart.mariadb.fullname" . }}
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: mariadb-operator
@@ -36,5 +40,51 @@ spec:
         - port: 53
           protocol: UDP
         - port: 53
+          protocol: TCP
+{{- end }}
+{{- if and .Values.mariadb.enabled .Values.mariadb.backup.enabled }}
+---
+# mariadb-operator's PhysicalBackup Jobs run in this namespace (not in mariadb-operator's), with no
+# labels of their own beyond the ones set via spec.podMetadata in physicalbackup.yaml -- they need
+# their own egress rule to reach the MariaDB Pod, DNS and the S3 endpoint.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-database-backup
+  labels:
+    {{- include "itop-chart.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: mariadb-backup
+      app.kubernetes.io/instance: {{ include "itop-chart.mariadb.fullname" . }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: mariadb
+              app.kubernetes.io/instance: {{ include "itop-chart.mariadb.fullname" . }}
+      ports:
+        - port: {{ .Values.mariadb.instance.port }}
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 443
           protocol: TCP
 {{- end }}

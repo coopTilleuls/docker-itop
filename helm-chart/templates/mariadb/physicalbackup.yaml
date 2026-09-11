@@ -8,6 +8,13 @@ metadata:
 spec:
   mariaDbRef:
     name: {{ include "itop-chart.mariadb.fullname" . }}
+  # Distinguishes the backup Job's pods from the rest of the release so the NetworkPolicy in
+  # networkpolicy.yaml can grant them egress (DNS, MariaDB, S3) -- without this label they'd only
+  # carry generic batch.kubernetes.io/job-name labels and fall under the namespace's default-deny.
+  podMetadata:
+    labels:
+      app.kubernetes.io/component: mariadb-backup
+      app.kubernetes.io/instance: {{ include "itop-chart.mariadb.fullname" . }}
   target: {{ .Values.mariadb.backup.target }}
   compression: {{ .Values.mariadb.backup.compression }}
   {{- if .Values.mariadb.backup.maxRetention }}
