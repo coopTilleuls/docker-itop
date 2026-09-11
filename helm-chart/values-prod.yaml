@@ -28,4 +28,4 @@ mariadb:
     maxRetention: "72h" # 3 jours
     storage:
       s3:
-        bucket: lt-mut-nonprod-scw-itop-mariadb-backup
+        bucket: lt-mut-prod-scw-itop-mariadb-backup
