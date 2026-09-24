@@ -46,6 +46,9 @@ mariadb:
     # Name of an existing secret with "root-password" and "password" keys.
     # Leave empty to let the chart generate and manage one automatically.
     existingSecret: ""
+  # Extra NetworkPolicy peers (podSelector/namespaceSelector...) allowed to reach MariaDB, on top of
+  # the iTop app, its backups and mariadb-operator -- e.g. a reporting tool in another namespace.
+  extraIngressFrom: []
   # Scheduled physical backups (mariadb-operator PhysicalBackup, mariabackup-based) to an S3
   # bucket. Disabled by default: the bucket/credentials secret only exist on environments where
   # the infra layer created them (opentofu-scaleway-infra-mut, 3_k8s_objects/mariadb_backup.tf,

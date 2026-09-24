@@ -25,6 +25,9 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: mariadb-operator
+        {{- with .Values.mariadb.extraIngressFrom }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       ports:
         - port: {{ .Values.mariadb.instance.port }}
           protocol: TCP

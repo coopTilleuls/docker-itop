@@ -21,6 +21,15 @@ mariadb:
     suspend: false
   auth:
     existingSecret: itop-mariadb-auth
+  # Metabase (coopTilleuls/metabase, namespace prod-metabase) queries the iTop database.
+  extraIngressFrom:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: prod-metabase
+      podSelector:
+        matchLabels:
+          app: metabase
+          release: metabase
   backup:
     enabled: true
     # Base suspendue par défaut (cf. instance.suspend ci-dessus) : pas de pod à sauvegarder, donc
