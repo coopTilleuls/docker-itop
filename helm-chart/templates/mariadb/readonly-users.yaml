@@ -1,0 +1,75 @@
+{{- if .Values.mariadb.enabled }}
+{{- $fullName := include "itop-chart.mariadb.fullname" . }}
+{{- range .Values.mariadb.readOnlyUsers }}
+{{- $secretName := printf "%s-%s-auth" $fullName . }}
+---
+# Read-only user (SELECT on the iTop database) for tools querying it from another namespace, e.g.
+# Metabase -- copy the "password" key of this Secret into the tool's own configuration. Generated
+# once by ESO, same reasoning as secret.yaml (no `lookup` through ArgoCD).
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Password
+metadata:
+  name: {{ $fullName }}-{{ . }}-password
+  labels:
+    {{- include "itop-chart.labels" $ | nindent 4 }}
+spec:
+  length: 32
+  symbols: 0
+  symbolCharacters: ""
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: {{ $secretName }}
+  labels:
+    {{- include "itop-chart.labels" $ | nindent 4 }}
+spec:
+  refreshPolicy: CreatedOnce
+  target:
+    name: {{ $secretName }}
+    creationPolicy: Owner
+    immutable: true
+    template:
+      type: Opaque
+      data:
+        username: {{ . | quote }}
+        password: {{ `{{ .password }}` | quote }}
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: Password
+          name: {{ $fullName }}-{{ . }}-password
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: {{ $fullName }}-{{ . }}
+  labels:
+    {{- include "itop-chart.labels" $ | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ $fullName }}
+  name: {{ . }}
+  passwordSecretKeyRef:
+    name: {{ $secretName }}
+    key: password
+  host: "%"
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  name: {{ $fullName }}-{{ . }}
+  labels:
+    {{- include "itop-chart.labels" $ | nindent 4 }}
+spec:
+  mariaDbRef:
+    name: {{ $fullName }}
+  privileges:
+    - "SELECT"
+  database: {{ $.Values.mariadb.database.name }}
+  table: "*"
+  username: {{ . }}
+  host: "%"
+{{- end }}
+{{- end }}

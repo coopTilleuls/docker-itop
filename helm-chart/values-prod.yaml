@@ -30,6 +30,9 @@ mariadb:
         matchLabels:
           app: metabase
           release: metabase
+  # Its password is in the Secret itop-mariadb-metabase-auth, to copy into Metabase's data source.
+  readOnlyUsers:
+    - metabase
   backup:
     enabled: true
     # Base suspendue par défaut (cf. instance.suspend ci-dessus) : pas de pod à sauvegarder, donc
