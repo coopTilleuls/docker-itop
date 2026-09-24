@@ -2,9 +2,9 @@ route:
   host: support.les-tilleuls.coop
   extraHosts: 
     - itop.lt-mut-prod-scw.les-tilleuls.solutions
-mage:
+image:
   repository: rg.fr-par.scw.cloud/infra-mut-cr-scw/itop-apache
-  tag: nonprod-0.9.9
+  tag: prod-0.9.9
 
 # Secret de pull du registry privé Scaleway, créé par argocd_sites.tf dans ce namespace (même
 # convention que le chart otterwiki).
