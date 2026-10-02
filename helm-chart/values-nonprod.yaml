@@ -19,11 +19,17 @@ imagePullSecrets:
 # Standby par défaut : ni l'app ni la base ne tournent tant qu'on n'a pas explicitement besoin de
 # tester (repasser replicaCount à 1 et mariadb.instance.suspend à false le temps du test, puis
 # revert). Les PVC (app + mariadb) restent créés et conservent leurs données pendant la suspension.
-replicaCount: 1
+replicaCount: 0
 
 mariadb:
   instance:
-    suspend: false
+    suspend: true
+    # Défaut values.yaml : 512Mi. Mesuré sur 7j (2026-10-02) : max ~330Mi, p95 ~315Mi, CPU max
+    # ~20m (pas de myCnf, buffer pool InnoDB par défaut à 128M).
+    resources:
+      requests:
+        cpu: 100m
+        memory: 384Mi
   auth:
     existingSecret: itop-mariadb-auth
   backup:
@@ -31,7 +37,7 @@ mariadb:
     # Base suspendue par défaut (cf. instance.suspend ci-dessus) : pas de pod à sauvegarder, donc
     # pas de schedule -- repasser à false en même temps que instance.suspend le temps du test.
     schedule:
-      suspend: false
+      suspend: true
     maxRetention: "72h" # 3 jours
     storage:
       s3:
