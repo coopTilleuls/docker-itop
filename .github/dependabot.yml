@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # SHA-pinned GitHub Actions (Dependabot bumps the pin and the version comment).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Paris
+    open-pull-requests-limit: 10
+    groups:
+      github-actions-patch:
+        patterns: ["*"]
+        update-types: ["patch"]
+
+  # Base image of the iTop image actually built and deployed (3.2-custum, see build.yml).
+  # The other version directories are legacy and are not built by the CI.
+  - package-ecosystem: docker
+    directory: /3.2-custum
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Paris
+    open-pull-requests-limit: 10
+    groups:
+      docker-patch:
+        patterns: ["*"]
+        update-types: ["patch"]
