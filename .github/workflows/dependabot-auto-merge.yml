@@ -1,0 +1,17 @@
+# Caller for the shared Dependabot auto-merge workflow. Which pull requests it
+# merges, the accepted levels and why this file is shaped the way it is are all
+# documented once, with the workflow:
+# https://github.com/coopTilleuls/TMA-utils/blob/main/README.md#tma-dependabot-automergeyml
+name: dependabot-auto-merge
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    uses: coopTilleuls/TMA-utils/.github/workflows/tma-dependabot-automerge.yml@3d92a275202f58a2e81a93f9e4d2361f3c9a0a57 # v0.0.1
+    with:
+      level: ${{ vars.DEPENDABOT_AUTOMERGE }}
